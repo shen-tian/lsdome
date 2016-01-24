@@ -14,7 +14,7 @@ AudioPlayer sound;
 FFT fft;
 float[] fftFilter;
 
-String filename = "/Users/Shen/kafkaf.mp3";
+String filename = "083_trippy-ringysnarebeat-3bars.mp3";
 float spin = 0.001;
 float radiansPerBucket = radians(2);
 float decay = 0.97;
