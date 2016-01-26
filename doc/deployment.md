@@ -1,10 +1,20 @@
 # Notes on deploying this stuff
 
+## Setting up `fcserver`
+
+Mainly followed this https://learn.adafruit.com/1500-neopixel-led-curtain-with-raspberry-pi-fadecandy/fadecandy-server-setup .
+
+Config file is `/usr/local/bin/fcserver.json`.
+
+Note that brightness limit is set using the whitepoint setting. Can this be updated on the fly?
+
 ## Steps taken to run sketches on Raspbian
 
 You have to be in X to run processing sketches. So to autoboot into it, there things were done, in no particular order.
 
-* Export the sketch, targeting Linux (don't need to worry about arch)
+### Exporting the sketch
+
+Export the sketch, targeting Linux (don't need to worry about arch)
 
 ### Setup the Pi so that the sketch runs 
 
@@ -28,8 +38,6 @@ framebuffer_depth=32
 framebuffer_ignore_alpha=1
 ```
 
-* Ensure that X is running in 32bit mode
-
 ### Automatically launch into X, then the sketch
 
 `sudo raspi-config` launches a config utility. One of the options there allows you to launch X automatically on boot.
@@ -41,10 +49,17 @@ format is something like this:
 ```
 [Desktop Entry]
 Name=Cloud Autostart
-Exec=sh /home/pi/sketches/application.linux32/triangle_clouds
+Exec=sh /path/yoursketch
 Type=Application
 Terminal=true
 ```
 
-Tried adding stuff to end of `sudo nano /etc/xdg/lxsession/LXDE-pi/autostart` but it didn't work.
+This also seem to run without screensaver/power saving issues. Not sure if its anything in the config, or just what a Pi with Raspbian does.
+
+#### Possible alternative:
+
+Tried adding `@/bin/sh /path/yoursketch` to end of `/etc/xdg/lxsession/LXDE/autostart` but it didn't work.
+
+Maybe it should be added to `LXDE-pi/autostart`? 
+
 
