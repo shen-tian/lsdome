@@ -5,11 +5,12 @@
 
 OPC opc;
 float dx, dy;
+boolean hud;
+float scale = 0.005;
 
 void setup()
 {
-  int canvasSize = 125;
-  size(canvasSize, canvasSize);
+  size(200, 200);
   setupOpc("127.0.0.1");
   colorMode(HSB, 100);
 }
@@ -50,33 +51,68 @@ float fractalNoise(float x, float y, float z) {
   return r;
 }
 
+boolean render(int x, int y) {
+  for (int i = 0; i < opc.pixelLocations.length; i++)
+    if opc.pixelLocations[i] == x + width * y)
+      return true;
+  return false;
+}
+
 void draw() {
+
+  hud = false;
+  if (keyPressed) {
+    hud = (key == 'v' || key == 'V');
+    if (key == '[')
+      scale *= 2;
+    if (key == ']')
+      scale /= 2;
+  }
+
   long now = millis();
   float speed = 0.002;
   float angle = sin(now * 0.001);
+  //float angle = now * 0.001;
   float z = now * 0.00008;
   float hue = now * 0.01;
-  float scale = 0.005;
+  // Feels like this should be linked to canvas size. The smaller the canvas, the larger it
+  // should be.
 
-  //dx += cos(angle) * speed;
-  //dy += sin(angle) * speed;
+  dx += cos(angle) * speed;
+  dy += sin(angle) * speed;
 
   loadPixels();
+
   for (int x=0; x < width; x++) {
     for (int y=0; y < height; y++) {
+      if (render(x, y)) {
+        float n = fractalNoise(dx + x*scale, dy + y*scale, z) - 0.75;
+        float m = fractalNoise(dx + x*scale, dy + y*scale, z + 10.0) - 0.75;
 
-      float n = fractalNoise(dx + x*scale, dy + y*scale, z) - 0.75;
-      float m = fractalNoise(dx + x*scale, dy + y*scale, z + 10.0) - 0.75;
+        color c = color(
+        (hue + 80.0 * m) % 100.0, 
+        100 - 100 * constrain(pow(3.0 * n, 3.5), 0, 0.9), 
+        100 * constrain(pow(3.0 * n, 1.5), 0, 0.9)
+          );
 
-      color c = color(
-      (hue + 80.0 * m) % 100.0, 
-      100 - 100 * constrain(pow(3.0 * n, 3.5), 0, 0.9), 
-      100 * constrain(pow(3.0 * n, 1.5), 0, 0.9)
-        );
-
-      pixels[x + width*y] = c;
+        pixels[x + width*y] = c;
+      } else
+        pixels[x + width * y] = color(0, 0, 0);
     }
   }
   updatePixels();
+
+  if (hud)
+  {
+    // Show the FPS
+    int txtSize = 16;
+    textSize(txtSize);
+    fill(0, 100, 100);
+    text((int)frameRate + "fps", 2, (txtSize + 2)); 
+    text("dx " + dx, 2, (txtSize + 2) * 2);
+    text("dy " + dy, 2, (txtSize + 2) * 3);
+    text("angle " + angle, 2, (txtSize + 2) * 4);
+    text("scale " + scale, 2, (txtSize + 2) * 5);
+  }
 }
 
