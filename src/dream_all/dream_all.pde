@@ -6,7 +6,7 @@
 OPC opc;
 
 // state variables for cloud
-float dx, dy;
+float dx, dy, dz;
 boolean hud;
 
 
@@ -16,7 +16,7 @@ void setup()
 {
   size(250, 250, P2D);
   setupOpc("127.0.0.1");
-  setupMask(3);
+  setupMask(7);
   colorMode(HSB, 100);
 }
 
@@ -78,13 +78,8 @@ boolean render(int x, int y) {
   return mask[x + y * width];
 }
 
-void draw() {
-
-  hud = false;
-  if (keyPressed) {
-    hud = (key == 'v' || key == 'V');
-  }
-
+void drawCloud()
+{
   long now = millis();
   float speed = 0.002;
   float angle = sin(now * 0.001);
@@ -118,6 +113,65 @@ void draw() {
     }
   }
   updatePixels();
+}
+
+void drawRings() {
+  long now = millis();
+  float speed = 0.002;
+  float zspeed = 0.1;
+  float angle = sin(now * 0.001);
+  float z = now * 0.00008;
+  float hue = now * 0.01;
+  float scale = 0.005;
+
+  float saturation = 100 * constrain(pow(1.15 * noise(now * 0.000122), 2.5), 0, 1);
+  float spacing = noise(now * 0.000124) * 0.1;
+
+  dx += cos(angle) * speed;
+  dy += sin(angle) * speed;
+  dz += (noise(now * 0.000014) - 0.5) * zspeed;
+
+  float centerx = noise(now *  0.000125) * 1.25 * width;
+  float centery = noise(now * -0.000125) * 1.25 * height;
+
+  loadPixels();
+  for (int x=0; x < width; x++) {
+    for (int y=0; y < height; y++) {
+      if (render(x, y)) {
+
+        float dist = sqrt(pow(x - centerx, 2) + pow(y - centery, 2));
+        float pulse = (sin(dz + dist * spacing) - 0.3) * 0.3;
+
+        float n = fractalNoise(dx + x*scale + pulse, dy + y*scale, z) - 0.75;
+        float m = fractalNoise(dx + x*scale, dy + y*scale, z + 10.0) - 0.75;
+
+        color c = color(
+        (hue + 40.0 * m) % 100.0, 
+        saturation, 
+        100 * constrain(pow(3.0 * n, 1.5), 0, 0.9)
+          );
+
+        pixels[x + width*y] = c;
+      }
+    }
+  }
+  updatePixels();
+}
+
+void draw() {
+
+  hud = false;
+  boolean ring = false;
+  if (keyPressed) {
+    hud = (key == 'v' || key == 'V');
+    ring = (key == 'r');
+  }
+
+  //drawCloud();
+  if (ring)
+    drawRings();
+  else
+    drawCloud();
 
   if (hud)
   {
@@ -128,8 +182,6 @@ void draw() {
     text((int)frameRate + "fps", 2, (txtSize + 2)); 
     text("dx " + dx, 2, (txtSize + 2) * 2);
     text("dy " + dy, 2, (txtSize + 2) * 3);
-    text("angle " + angle, 2, (txtSize + 2) * 4);
-    text("scale " + scale, 2, (txtSize + 2) * 5);
   }
 }
 
