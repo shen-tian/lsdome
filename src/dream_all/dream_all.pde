@@ -4,15 +4,17 @@
  */
 
 OPC opc;
+
+// state variables for cloud
 float dx, dy;
 boolean hud;
-float scale = 0.005;
+
 
 boolean[] mask;
 
 void setup()
 {
-  size(500, 500);
+  size(250, 250, P2D);
   setupOpc("127.0.0.1");
   setupMask(3);
   colorMode(HSB, 100);
@@ -91,6 +93,7 @@ void draw() {
   float hue = now * 0.01;
   // Feels like this should be linked to canvas size. The smaller the canvas, the larger it
   // should be.
+  float scale = 0.005;
 
   dx += cos(angle) * speed;
   dy += sin(angle) * speed;
