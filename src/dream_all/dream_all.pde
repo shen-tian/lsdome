@@ -53,22 +53,26 @@ void setupOpcMulti(String hostname)
 
   int n = 15;
 
-  float theta = (float)(Math.PI / 3);
+  float spacing = width / (2 * n);
+  
+  float heightTotal = spacing * (n - 1) * sqrt(3) / 2.0;
+  float distToCentroid = spacing * (n - 1) / (2.0 * sqrt(3));
 
-  float centerX = width / 2 + width / 10;
-  float centerY = height / 2 - width * .038;
+  float theta = 0;
+  float centerX = width / 2;
+  float centerY = height / 2 + heightTotal / 2 - distToCentroid;
 
-  opc.ledTriangle(0, n, centerX, centerY, width/2 * .9 / n, theta, false);
+  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
 
-  theta -= Math.PI / 3;
-  centerX = (float)(width/2 + width/4*(Math.sin(theta)-Math.cos(theta))) + width / 20;
-  centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width / 20;
-  opc.ledTriangle(120, n, centerX, centerY, width/2 * .9 / n, theta, false);
+  theta = (float) Math.PI / 3;
+  centerX = width / 2 - width / 4;
+  centerY = height / 2 - heightTotal / 2 + distToCentroid;;
+  opc.ledTriangle(120, n, centerX, centerY, spacing, theta, false);
 
-  centerX = (float)(width/2 - width/4*(Math.sin(theta)-Math.cos(theta))) + width * .09;
-  centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width * .16;
-  theta += Math.PI * 2 /3;
-  opc.ledTriangle(240, n, centerX, centerY, width/2 * .9 / n, theta, false);
+  centerX = width / 2 + width / 4;
+  centerY = height / 2 - heightTotal / 2 + distToCentroid;
+  theta += (float) 2 * Math.PI / 3;
+  opc.ledTriangle(240, n, centerX, centerY, spacing, theta, false);
 }
 
 void setupMask(float radius)
