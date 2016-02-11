@@ -4,10 +4,14 @@
  */
 
 OPC opc;
+PImage dot;
+
+int mode;
 
 // state variables for cloud
 float dx, dy, dz;
 boolean hud;
+
 
 
 boolean[] mask;
@@ -15,8 +19,10 @@ boolean[] mask;
 void setup()
 {
   size(250, 250, P2D);
-  setupOpc("127.0.0.1");
-  setupMask(7);
+  dot = loadImage("dot.png");
+  mode = 0;
+  setupOpcMulti("127.0.0.1");
+  setupMask(3);
   colorMode(HSB, 100);
 }
 
@@ -25,7 +31,7 @@ void setupOpc(String hostname)
   opc = new OPC(this, hostname, 7890);
 
   // Code to lay out the pixels
-  int n = 15;
+  int n = 25;
 
   float h_pitch = width / n;
   float v_pitch = h_pitch * sqrt(3) / 2;
@@ -39,6 +45,32 @@ void setupOpc(String hostname)
   }
   // Make the status LED quiet
   opc.setStatusLed(false);
+}
+
+void setupOpcMulti(String hostname)
+{
+  opc = new OPC(this, "127.0.0.1", 7890);
+
+  int n = 15;
+
+  int index = 0;
+
+  float theta = (float)(Math.PI / 3);
+
+  float centerX = width / 2 + width / 10;
+  float centerY = height / 2 - width * .038;
+
+  index += opc.ledTriangle(0, n, centerX, centerY, width/2 * .9, theta, false);
+
+  theta -= Math.PI / 3;
+  centerX = (float)(width/2 + width/4*(Math.sin(theta)-Math.cos(theta))) + width / 20;
+  centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width / 20;
+  index += opc.ledTriangle(index, n, centerX, centerY, width/2 * .9, theta, false);
+
+  centerX = (float)(width/2 - width/4*(Math.sin(theta)-Math.cos(theta))) + width * .09;
+  centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width * .16;
+  theta += Math.PI * 2 /3;
+  index += opc.ledTriangle(index, n, centerX, centerY, width/2 * .9, theta, false);
 }
 
 void setupMask(float radius)
@@ -158,20 +190,38 @@ void drawRings() {
   updatePixels();
 }
 
+void drawDot() {
+   background(0);
+
+  // Change the dot size as a function of time, to make it "throb"
+  float dotSize = height * 0.6 * (1.0 + 0.2 * sin(millis() * 0.01));
+
+  // Draw it centered at the mouse location
+  image(dot, mouseX - dotSize/2, mouseY - dotSize/2, dotSize, dotSize);
+}
+
+
 void draw() {
 
   hud = false;
   boolean ring = false;
   if (keyPressed) {
     hud = (key == 'v' || key == 'V');
-    ring = (key == 'r');
+    if (key == 'c')
+      mode = 0;
+    if (key == 'r')
+      mode = 1;
+    if (key == 'd')
+      mode = 2;
   }
 
   //drawCloud();
-  if (ring)
+  if (mode == 1)
     drawRings();
-  else
+  if (mode == 0)
     drawCloud();
+  if (mode ==2)
+    drawDot();
 
   if (hud)
   {
