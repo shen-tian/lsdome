@@ -53,24 +53,22 @@ void setupOpcMulti(String hostname)
 
   int n = 15;
 
-  int index = 0;
-
   float theta = (float)(Math.PI / 3);
 
   float centerX = width / 2 + width / 10;
   float centerY = height / 2 - width * .038;
 
-  index += opc.ledTriangle(0, n, centerX, centerY, width/2 * .9, theta, false);
+  opc.ledTriangle(0, n, centerX, centerY, width/2 * .9 / n, theta, false);
 
   theta -= Math.PI / 3;
   centerX = (float)(width/2 + width/4*(Math.sin(theta)-Math.cos(theta))) + width / 20;
   centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width / 20;
-  index += opc.ledTriangle(index, n, centerX, centerY, width/2 * .9, theta, false);
+  opc.ledTriangle(120, n, centerX, centerY, width/2 * .9 / n, theta, false);
 
   centerX = (float)(width/2 - width/4*(Math.sin(theta)-Math.cos(theta))) + width * .09;
   centerY = (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))) + width * .16;
   theta += Math.PI * 2 /3;
-  index += opc.ledTriangle(index, n, centerX, centerY, width/2 * .9, theta, false);
+  opc.ledTriangle(240, n, centerX, centerY, width/2 * .9 / n, theta, false);
 }
 
 void setupMask(float radius)

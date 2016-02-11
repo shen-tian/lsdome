@@ -47,20 +47,22 @@ public class OPC implements Runnable
     pixelLocations[index] = x + width * y;
   }
 
-  int ledTriangle(int index, int n, float centerx, float centery,
-      float len, float angle, boolean flip) {  
-    float h_pitch = len / n;
+  // Set the location of a group of LEDs arranged in an equilateral triangle.
+  // Angle is in radians,
+  // (x, y) is the centroid of the triangle.
+  void ledTriangle(int index, int n, float x, float y,
+      float spacing, float angle, boolean flip) {  
+    float h_pitch = spacing;
     float v_pitch = h_pitch * sqrt(3) / 2;
     for (int i = n; i > 0; i--) {
       float dx = 0;
       float dy = (i - n/2 - .5) * v_pitch;
       float dxrot = (float)(dx*Math.cos(angle) + dy*-Math.sin(angle));
       float dyrot = (float)(dx*Math.sin(angle) + dy*Math.cos(angle));
-      ledStrip(index, i, centerx + dxrot, centery + dyrot, h_pitch, angle, flip);
+      ledStrip(index, i, x + dxrot, y + dyrot, h_pitch, angle, flip);
       index += i;
       flip = !flip;
     }
-    return index;
   }
   
   // Set the location of several LEDs arranged in a strip.
