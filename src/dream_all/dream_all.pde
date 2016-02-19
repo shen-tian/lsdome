@@ -21,8 +21,9 @@ void setup()
   size(250, 250, P2D);
   dot = loadImage("dot.png");
   mode = 0;
-  setupOpcMulti("127.0.0.1");
-  setupMask(3);
+  //setupOpcMulti("127.0.0.1");
+  setupOpcMulti("192.168.1.135");
+  setupMask(4);
   colorMode(HSB, 100);
 }
 
@@ -49,30 +50,31 @@ void setupOpc(String hostname)
 
 void setupOpcMulti(String hostname)
 {
-  opc = new OPC(this, "127.0.0.1", 7890);
+  opc = new OPC(this, hostname, 7890);
 
   int n = 15;
 
   float spacing = width / (2 * n);
-  
+
   float heightTotal = spacing * (n - 1) * sqrt(3) / 2.0;
   float distToCentroid = spacing * (n - 1) / (2.0 * sqrt(3));
 
-  float theta = 0;
+  float theta = (float) Math.PI / 3;
   float centerX = width / 2;
-  float centerY = height / 2 + heightTotal / 2 - distToCentroid;
+  float centerY = height / 2 - heightTotal / 2 + distToCentroid;
 
-  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
-
-  theta = (float) Math.PI / 3;
-  centerX = width / 2 - width / 4;
-  centerY = height / 2 - heightTotal / 2 + distToCentroid;;
   opc.ledTriangle(120, n, centerX, centerY, spacing, theta, false);
 
+  theta = (float) (0 * Math.PI / 3);
+  centerX = width / 2 - width / 4;
+  centerY = height / 2 + heightTotal / 2 - distToCentroid;
+  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
+
   centerX = width / 2 + width / 4;
-  centerY = height / 2 - heightTotal / 2 + distToCentroid;
+  centerY = height / 2 + heightTotal / 2 - distToCentroid;
   theta += (float) 2 * Math.PI / 3;
-  opc.ledTriangle(240, n, centerX, centerY, spacing, theta, false);
+  opc.ledTriangle(360, n, centerX, centerY, spacing, theta, false);
+  //opc.ledTriangle(240, n, centerX, centerY, spacing, theta, false);
 }
 
 void setupMask(float radius)
@@ -186,14 +188,15 @@ void drawRings() {
           );
 
         pixels[x + width*y] = c;
-      }
+      } else
+        pixels[x + width * y] = color(0, 0, 0);
     }
   }
   updatePixels();
 }
 
 void drawDot() {
-   background(0);
+  background(0);
 
   // Change the dot size as a function of time, to make it "throb"
   float dotSize = height * 0.6 * (1.0 + 0.2 * sin(millis() * 0.01));

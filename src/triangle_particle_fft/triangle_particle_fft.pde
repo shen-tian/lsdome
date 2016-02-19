@@ -8,48 +8,61 @@ import ddf.minim.*;
 OPC opc;
 PImage dot;
 PImage colors;
-TriangleGrid triangle;
 Minim minim;
-AudioPlayer sound;
+AudioInput in;
 FFT fft;
 float[] fftFilter;
 
-String filename = "083_trippy-ringysnarebeat-3bars.mp3";
+//String filename = "083_trippy-ringysnarebeat-3bars.mp3";
+String filename = "/Users/Shen/kafkaf.mp3";
 float spin = 0.001;
 float radiansPerBucket = radians(2);
 float decay = 0.97;
 float opacity = 40;
 float minSize = 0.1;
-float sizeScale = 0.25;
+float sizeScale = 0.125;
 
 void setup()
 {
-  size(250, 250, P3D);
+  size(250, 250, P2D);
 
-  minim = new Minim(this); 
+   minim = new Minim(this); 
 
   // Small buffer size!
-  sound = minim.loadFile(filename, 512);
-  sound.loop();
-  fft = new FFT(sound.bufferSize(), sound.sampleRate());
+  in = minim.getLineIn();
+
+  fft = new FFT(in.bufferSize(), in.sampleRate());
   fftFilter = new float[fft.specSize()];
 
   dot = loadImage("dot.png");
   colors = loadImage("colors.png");
 
   // Connect to the local instance of fcserver
-  //opc = new OPC(this, "192.168.1.135", 7890);
-  opc = new OPC(this, "127.0.0.1", 7890);
+  opc = new OPC(this, "192.168.1.135", 7890);
+  //opc = new OPC(this, "127.0.0.1", 7890);
 
   int n = 15;
 
-  int index = 0;
-  index += opc.ledTriangle(index, n, width/4, height/2, width/2, 0, false);
-  float theta = (float)(Math.PI/3);
-  index += opc.ledTriangle(index, n, 
-  (float)(width/2 + width/4*(Math.sin(theta)-Math.cos(theta))), 
-  (float)(.75f*height - width/4*(Math.sin(theta)+Math.cos(theta))), width/2, theta, false);
+  float spacing = width / (2 * n);
 
+  float heightTotal = spacing * (n - 1) * sqrt(3) / 2.0;
+  float distToCentroid = spacing * (n - 1) / (2.0 * sqrt(3));
+
+  float theta = (float) Math.PI / 3;
+  float centerX = width / 2;
+  float centerY = height / 2 - heightTotal / 2 + distToCentroid;
+
+  opc.ledTriangle(120, n, centerX, centerY, spacing, theta, false);
+
+  theta = (float) (0 * Math.PI / 3);
+  centerX = width / 2 - width / 4;
+  centerY = height / 2 + heightTotal / 2 - distToCentroid;
+  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
+
+  centerX = width / 2 + width / 4;
+  centerY = height / 2 + heightTotal / 2 - distToCentroid;
+  theta += (float) 2 * Math.PI / 3;
+  opc.ledTriangle(360, n, centerX, centerY, spacing, theta, false);
   // Make the status LED quiet
   opc.setStatusLed(false);
 }
@@ -58,7 +71,7 @@ void draw()
 {
   background(0);
 
-  fft.forward(sound.mix);
+  fft.forward(in.mix);
   for (int i = 0; i < fftFilter.length; i++) {
     fftFilter[i] = max(fftFilter[i] * decay, log(1 + fft.getBand(i)));
   }
