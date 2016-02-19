@@ -8,6 +8,9 @@ import ddf.minim.*;
 OPC opc;
 PImage dot;
 PImage colors;
+PImage colors1;
+PImage colors2;
+PImage colors3;
 Minim minim;
 AudioInput in;
 FFT fft;
@@ -20,13 +23,13 @@ float radiansPerBucket = radians(2);
 float decay = 0.97;
 float opacity = 40;
 float minSize = 0.1;
-float sizeScale = 0.125;
+float sizeScale = 0.2;
 
 void setup()
 {
   size(250, 250, P2D);
 
-   minim = new Minim(this); 
+  minim = new Minim(this); 
 
   // Small buffer size!
   in = minim.getLineIn();
@@ -35,7 +38,11 @@ void setup()
   fftFilter = new float[fft.specSize()];
 
   dot = loadImage("dot.png");
-  colors = loadImage("colors.png");
+  colors1 = loadImage("colors.png");
+  colors2 = loadImage("colors2.png");
+  colors3 = loadImage("colors3.png");
+  
+  colors = colors1;
 
   // Connect to the local instance of fcserver
   opc = new OPC(this, "192.168.1.135", 7890);
@@ -70,6 +77,15 @@ void setup()
 void draw()
 {
   background(0);
+
+  if (keyPressed) {
+    if (key == '1')
+      colors = colors1;
+    if (key == '2')
+      colors = colors2;
+    if (key == '3')
+      colors = colors3;
+  }
 
   fft.forward(in.mix);
   for (int i = 0; i < fftFilter.length; i++) {
