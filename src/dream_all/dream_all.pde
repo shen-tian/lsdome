@@ -18,37 +18,20 @@ boolean[] mask;
 
 void setup()
 {
-  size(800, 800, P2D);
+  size(300, 300, P2D);
   dot = loadImage("dot.png");
   mode = 0;
   //setupOpc("127.0.0.1");
   setupOpc("192.168.1.135");
-  setupMask(4);
+  setupMask(2);
   colorMode(HSB, 100);
 }
 
 void setupOpc(String hostname)
 {
   opc = new OPC(this, hostname, 7890);
-
   int PANEL_LENGTH = 15;
-
-  ArrayList<PVector> points = new ArrayList<PVector>();
-  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
-    p.add(LayoutUtil.axialToXy(new PVector(0, -1)));
-    points.add(p);
-  }
-  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
-    p.rotate(-PI / 3.);
-    p.add(LayoutUtil.axialToXy(new PVector(1, -1)));
-    points.add(p);
-  }
-  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
-    p.rotate(-PI * 2 / 3.);
-    p.add(LayoutUtil.axialToXy(new PVector(1, 0)));
-    points.add(p);
-  }
-  LayoutUtil.registerScreenSamples(opc, points, width, height, 2., true);
+  LayoutUtil.registerScreenSamples(opc, LayoutUtil.fillLSDome(PANEL_LENGTH), width, height, 4., true);
 }
 
 void setupMask(float radius)

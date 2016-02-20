@@ -25,6 +25,47 @@ public static class LayoutUtil {
     return points;
   }
 
+  // Fill a triangle using the sizing and entry/exit semantics from above, where the triangle's origin is
+  // the axial UV coordinate 'entry' and rotated clockwise by angle 60deg * rot
+  static ArrayList<PVector> fillTriangle(PVector entry, int rot, int n) {
+    ArrayList<PVector> points = fillTriangle(n);
+    for (PVector p : points) {
+      p.rotate(-rot * PI / 3.);
+      p.add(axialToXy(entry));
+    }
+    return points;
+  }
+
+  // Get the exit point for a triangle fill
+  static PVector fillExitPoint(PVector entry, int rot) {
+    return axialNeighbor(entry, rot - 1);
+  }
+
+  // Fill a fan of triangles proceeding in a clockwise fashion until a complete hexagon whose perimeter
+  // intersects the origin is filled. 'segments' is the number of triangular segments to fill (up to 6).
+  // 'pixels' is the fill density within each triangle. 'orientation' is the initial orientation in
+  // which the long axis of the hexagon follows the angle specified by 'rot' semantics above.
+  static ArrayList<PVector> fillFan(int orientation, int segments, int pixels) {
+    ArrayList<PVector> points = new ArrayList<PVector>();
+    PVector entry = new PVector(0., 0.);
+    int rot = orientation;
+    for (int i = 0; i < segments; i++) {
+      points.addAll(fillTriangle(entry, rot, pixels));
+      entry = fillExitPoint(entry, rot);
+      rot += 1;
+    }
+    return points;
+  }
+
+  // Fill the 24-panel lsdome configuration
+  static ArrayList<PVector> fillLSDome(int n) {
+    ArrayList<PVector> points = new ArrayList<PVector>();
+    for (int i = 0; i < 6; i++) {
+      points.addAll(fillFan(i, 4, n));
+    }
+    return points;
+  }
+
   // Compute a basis transformation for vector p, where u is the transformation result of basis vector U (1, 0),
   // and v is the transformation of basis V (0, 1)
   static PVector basisTransform(PVector p, PVector u, PVector v) {
@@ -59,4 +100,24 @@ public static class LayoutUtil {
     }
   }
 
+  // Return the adjacent axial coordinate moving from 'p' in direction 'rot'
+  static PVector axialNeighbor(PVector p, int rot) {
+    int axis = mod(rot, 3);
+    boolean hemi = (mod(rot, 6) < 3);
+    int du = (axis == 0 ? 0 : (hemi ? -1 : 1));
+    int dv = (axis == 2 ? 0 : (hemi ? 1 : -1));
+    return new PVector(p.x + du, p.y + dv);
+  }
+
+  // Return whether two axial coordinates are adjacent lattice points
+  static boolean axialCoordsAdjacent(PVector a, PVector b) {
+    int du = (int)a.x - (int)b.x;
+    int dv = (int)a.y - (int)b.y;
+    return (du >= -1 && du <= 1 && dv >= -1 && dv <= 1 && du != dv);
+  }
+
+  // Fix java's stupid AF mod operator to always return a positive result
+  static int mod(int a, int b) {
+    return ((a % b) + b) % b;
+  }
 }
