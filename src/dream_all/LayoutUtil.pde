@@ -2,6 +2,10 @@ public static class LayoutUtil {
 
   static float SQRT_3 = (float)Math.sqrt(3.);
 
+  static float pixelSpacing(int n) {
+    return 1. / (n - 1 + SQRT_3);
+  }
+
   // Evenly fill a triangle with a grid of points of size n. The triangle filled is an equilateral triangle
   // with points at (0, 0), (1, 0), and (.5, sqrt(3)/2). Points are placed such that spacing between two
   // adjacent points will match the spacing between an edge point and the opposing point of a neighboring
@@ -9,7 +13,7 @@ public static class LayoutUtil {
   // proceeding left/right, then upward. The point near (0, 0) will thus be known as the 'entry' point, and
   // the top-most point as the 'exit' point.
   static ArrayList<PVector> fillTriangle(int n) {
-    float spacing = 1. / (n - 1 + SQRT_3);
+    float spacing = pixelSpacing(n);
     PVector offset = new PVector(spacing * .5 * SQRT_3, spacing * .5);
 
     ArrayList<PVector> points = new ArrayList<PVector>();
