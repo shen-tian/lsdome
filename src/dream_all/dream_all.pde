@@ -18,11 +18,11 @@ boolean[] mask;
 
 void setup()
 {
-  size(250, 250, P2D);
+  size(800, 800, P2D);
   dot = loadImage("dot.png");
   mode = 0;
-  //setupOpcMulti("127.0.0.1");
-  setupOpcMulti("192.168.1.135");
+  //setupOpc("127.0.0.1");
+  setupOpc("192.168.1.135");
   setupMask(4);
   colorMode(HSB, 100);
 }
@@ -31,50 +31,24 @@ void setupOpc(String hostname)
 {
   opc = new OPC(this, hostname, 7890);
 
-  // Code to lay out the pixels
-  int n = 25;
+  int PANEL_LENGTH = 15;
 
-  float h_pitch = width / n;
-  float v_pitch = h_pitch * sqrt(3) / 2;
-
-  int j = 0;
-  boolean flip = false;
-  for (int i = n; i > 0; i--) {
-    opc.ledStrip(j, i, width/2, height/2 + (i - n/2 - .5) * v_pitch, h_pitch, 0, flip);
-    j += i;
-    flip = !flip;
+  ArrayList<PVector> points = new ArrayList<PVector>();
+  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
+    p.add(LayoutUtil.axialToXy(new PVector(0, -1)));
+    points.add(p);
   }
-  // Make the status LED quiet
-  opc.setStatusLed(false);
-}
-
-void setupOpcMulti(String hostname)
-{
-  opc = new OPC(this, hostname, 7890);
-
-  int n = 15;
-
-  float spacing = width / (2 * n);
-
-  float heightTotal = spacing * (n - 1) * sqrt(3) / 2.0;
-  float distToCentroid = spacing * (n - 1) / (2.0 * sqrt(3));
-
-  float theta = (float) Math.PI / 3;
-  float centerX = width / 2;
-  float centerY = height / 2 - heightTotal / 2 + distToCentroid;
-
-  opc.ledTriangle(120, n, centerX, centerY, spacing, theta, false);
-
-  theta = (float) (0 * Math.PI / 3);
-  centerX = width / 2 - width / 4;
-  centerY = height / 2 + heightTotal / 2 - distToCentroid;
-  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
-
-  centerX = width / 2 + width / 4;
-  centerY = height / 2 + heightTotal / 2 - distToCentroid;
-  theta += (float) 2 * Math.PI / 3;
-  opc.ledTriangle(360, n, centerX, centerY, spacing, theta, false);
-  //opc.ledTriangle(240, n, centerX, centerY, spacing, theta, false);
+  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
+    p.rotate(-PI / 3.);
+    p.add(LayoutUtil.axialToXy(new PVector(1, -1)));
+    points.add(p);
+  }
+  for (PVector p : LayoutUtil.fillTriangle(PANEL_LENGTH)) {
+    p.rotate(-PI * 2 / 3.);
+    p.add(LayoutUtil.axialToXy(new PVector(1, 0)));
+    points.add(p);
+  }
+  LayoutUtil.registerScreenSamples(opc, points, width, height, 2., true);
 }
 
 void setupMask(float radius)
