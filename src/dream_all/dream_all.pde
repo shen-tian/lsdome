@@ -23,7 +23,7 @@ void setup()
   mode = 0;
   //setupOpc("127.0.0.1");
   setupOpc("192.168.1.135");
-  setupMask(2);
+  setupMask(1);
   colorMode(HSB, 100);
 }
 
@@ -37,16 +37,18 @@ void setupOpc(String hostname)
 void setupMask(float radius)
 {
   mask = new boolean[width * height];
+  int window = (int)Math.ceil(radius) - 1;
 
-  for (int x=0; x < width; x++) {
-    for (int y=0; y < height; y++) {
-      mask[x + width * y] = false;
-      for (int i = 0; i < opc.pixelLocations.length; i++)
-      {
-        int thisX = opc.pixelLocations[i] % width;
-        int thisY = (opc.pixelLocations[i] - thisX) / width;
-        if (sq(thisX - x) + sq(thisY - y) <= sq(radius))
+  for (int i = 0; i < opc.pixelLocations.length; i++) {
+    int thisX = opc.pixelLocations[i] % width;
+    int thisY = (opc.pixelLocations[i] - thisX) / width;
+    for (int dx = -window; dx <= window; dx++) {
+      for (int dy = -window; dy <= window; dy++) {
+        int x = thisX + dx;
+        int y = thisY + dy;
+        if (x >= 0 && x < width && y >= 0 && y < height) {
           mask[x + width * y] = true;
+        }
       }
     }
   }
