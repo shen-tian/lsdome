@@ -13,7 +13,6 @@ ArrayList<ArrayList<PVector>> uv;
 void setup()
 {
   size(300, 300);
-  dot = loadImage("dot.png");
   //setupOpc("127.0.0.1");
   setupOpc("192.168.1.135");
   setupMask(1);
@@ -21,6 +20,7 @@ void setup()
 }
 
 int SUPERSAMPLE = 64;
+float FOV = 120;
 
 void setupOpc(String hostname)
 {
@@ -39,7 +39,7 @@ void setupOpc(String hostname)
       PVector offset = new PVector(random(1.) * .5 * LayoutUtil.pixelSpacing(PANEL_LENGTH), 0.);
       offset.rotate(random(1.) * 2*PI);
       PVector psub = PVector.add(p, offset);
-      sub.add(new PVector((float)Math.atan2(psub.y, psub.x), 4. / psub.mag()));
+      sub.add(new PVector((float)Math.atan2(psub.y, psub.x), 2. / (float)Math.tan(Math.toRadians(FOV / 2.)) / psub.mag()));
     }
   }
 }
