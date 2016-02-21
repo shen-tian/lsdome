@@ -40,6 +40,10 @@ void setupMask(float radius)
   int window = (int)Math.ceil(radius) - 1;
 
   for (int i = 0; i < opc.pixelLocations.length; i++) {
+    if (opc.pixelLocations[i] == -1) {
+      continue;
+    }
+
     int thisX = opc.pixelLocations[i] % width;
     int thisY = (opc.pixelLocations[i] - thisX) / width;
     for (int dx = -window; dx <= window; dx++) {

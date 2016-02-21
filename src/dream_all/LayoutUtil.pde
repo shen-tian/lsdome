@@ -96,7 +96,6 @@ public static class LayoutUtil {
 
   // For sampling from a rendered screen. Convert led positions from world coordinates to screen pixels and register with
   // the fadecandy(ies).
-  // TODO: properly handle when pixel coordinates exceed the viewport
   static void registerScreenSamples(OPC opc, ArrayList<PVector> points, int width, int height, float span, boolean horizSpan) {
     for (int ix = 0; ix < points.size(); ix++) {
       PVector px = xyToScreen(points.get(ix), width, height, span, horizSpan);

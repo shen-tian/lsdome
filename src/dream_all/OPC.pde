@@ -41,10 +41,15 @@ public class OPC implements Runnable
     if (pixelLocations == null) {
       pixelLocations = new int[index + 1];
     } else if (index >= pixelLocations.length) {
+      // TODO why not just use an ArrayList? current behavior is O(n^2)
       pixelLocations = Arrays.copyOf(pixelLocations, index + 1);
     }
 
-    pixelLocations[index] = x + width * y;
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      pixelLocations[index] = x + width * y;
+    } else {
+      pixelLocations[index] = -1;
+    }
   }
 
   // Set the locations of a ring of LEDs. The center of the ring is at (x, y),
@@ -208,7 +213,7 @@ public class OPC implements Runnable
 
     for (int i = 0; i < numPixels; i++) {
       int pixelLocation = pixelLocations[i];
-      int pixel = pixels[pixelLocation];
+      int pixel = (pixelLocation != -1 ? pixels[pixelLocation] : 0);
 
       packetData[ledAddress] = (byte)(pixel >> 16);
       packetData[ledAddress + 1] = (byte)(pixel >> 8);
