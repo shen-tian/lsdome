@@ -1,12 +1,11 @@
 /*
- * Fractal noise animation. Modified version of Micah Scott's code at 
- * https://github.com/scanlime/fadecandy/tree/master/examples/processing/grid24x8z_clouds
+ * Renderings of zooming down a straight tube, whose surface is an arbitrary UV-mapped texture.
+ * This is a prototype for direct pixel-based rendering. The screen itself is not rendered-- the pixel coordinates
+ * are evaluated directly (with antialiasing support) and written to the screen solely for visualization.
  */
 
 OPC opc;
-PImage dot;
 
-boolean[] mask;
 ArrayList<PVector> points;
 ArrayList<ArrayList<PVector>> uv;
 
@@ -15,7 +14,6 @@ void setup()
   size(300, 300);
   //setupOpc("127.0.0.1");
   setupOpc("192.168.1.135");
-  setupMask(1);
   colorMode(HSB, 100);
 }
 
@@ -42,34 +40,6 @@ void setupOpc(String hostname)
       sub.add(new PVector((float)Math.atan2(psub.y, psub.x), 2. / (float)Math.tan(Math.toRadians(FOV / 2.)) / psub.mag()));
     }
   }
-}
-
-void setupMask(float radius)
-{
-  mask = new boolean[width * height];
-  int window = (int)Math.ceil(radius) - 1;
-
-  for (int i = 0; i < opc.pixelLocations.length; i++) {
-    if (opc.pixelLocations[i] == -1) {
-      continue;
-    }
-
-    int thisX = opc.pixelLocations[i] % width;
-    int thisY = (opc.pixelLocations[i] - thisX) / width;
-    for (int dx = -window; dx <= window; dx++) {
-      for (int dy = -window; dy <= window; dy++) {
-        int x = thisX + dx;
-        int y = thisY + dy;
-        if (x >= 0 && x < width && y >= 0 && y < height) {
-          mask[x + width * y] = true;
-        }
-      }
-    }
-  }
-}
-
-boolean render(int x, int y) {
-  return mask[x + y * width];
 }
 
 int getTexture(PVector uv, float dist) {
