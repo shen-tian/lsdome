@@ -14,15 +14,13 @@ public static class LayoutUtil {
   // the top-most point as the 'exit' point.
   static ArrayList<PVector> fillTriangle(int n) {
     float spacing = pixelSpacing(n);
-    PVector offset = new PVector(spacing * .5 * SQRT_3, spacing * .5);
-
     ArrayList<PVector> points = new ArrayList<PVector>();
     for (int row = 0; row < n; row++) {
       boolean reversed = (row % 2 == 1);
       int width = n - row;
       for (int col = 0; col < width; col++) {
         int c = (reversed ? width - 1 - col : col);
-        PVector p = PVector.add(axialToXy(PVector.mult(new PVector(row, c), spacing)), offset);
+        PVector p = axialToXy(PVector.mult(new PVector(row + 1./SQRT_3, c + 1./SQRT_3), spacing));
         points.add(p);
       }
     }
