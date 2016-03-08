@@ -41,39 +41,14 @@ public class OPC implements Runnable
     if (pixelLocations == null) {
       pixelLocations = new int[index + 1];
     } else if (index >= pixelLocations.length) {
+      // TODO why not just use an ArrayList? current behavior is O(n^2)
       pixelLocations = Arrays.copyOf(pixelLocations, index + 1);
     }
 
-    pixelLocations[index] = x + width * y;
-  }
-
-  int ledTriangle(int index, int n, float centerx, float centery,
-      float len, float angle, boolean flip) {  
-    float h_pitch = len / n;
-    float v_pitch = h_pitch * sqrt(3) / 2;
-    for (int i = n; i > 0; i--) {
-      float dx = 0;
-      float dy = (i - n/2 - .5) * v_pitch;
-      float dxrot = (float)(dx*Math.cos(angle) + dy*-Math.sin(angle));
-      float dyrot = (float)(dx*Math.sin(angle) + dy*Math.cos(angle));
-      ledStrip(index, i, centerx + dxrot, centery + dyrot, h_pitch, angle, flip);
-      index += i;
-      flip = !flip;
-    }
-    return index;
-  }
-  
-  // Set the location of several LEDs arranged in a strip.
-  // Angle is in radians, measured clockwise from +X.
-  // (x,y) is the center of the strip.
-  void ledStrip(int index, int count, float x, float y, float spacing, float angle, boolean reversed)
-  {
-    float s = sin(angle);
-    float c = cos(angle);
-    for (int i = 0; i < count; i++) {
-      led(reversed ? (index + count - 1 - i) : (index + i),
-        (int)(x + (i - (count-1)/2.0) * spacing * c + 0.5),
-        (int)(y + (i - (count-1)/2.0) * spacing * s + 0.5));
+    if (x >= 0 && x < width && y >= 0 && y < height) {
+      pixelLocations[index] = x + width * y;
+    } else {
+      pixelLocations[index] = -1;
     }
   }
 
@@ -84,32 +59,9 @@ public class OPC implements Runnable
   {
     for (int i = 0; i < count; i++) {
       float a = angle + i * 2 * PI / count;
-      led(index + i, (int)(x - radius * cos(a) + 0.5),
-        (int)(y - radius * sin(a) + 0.5));
+      led(index + i, (int)(x - radius * cos(a) + 0.5), 
+      (int)(y - radius * sin(a) + 0.5));
     }
-  }
-
-  // Set the location of several LEDs arranged in a grid. The first strip is
-  // at 'angle', measured in radians clockwise from +X.
-  // (x,y) is the center of the grid.
-  void ledGrid(int index, int stripLength, int numStrips, float x, float y,
-               float ledSpacing, float stripSpacing, float angle, boolean zigzag)
-  {
-    float s = sin(angle + HALF_PI);
-    float c = cos(angle + HALF_PI);
-    for (int i = 0; i < numStrips; i++) {
-      ledStrip(index + stripLength * i, stripLength,
-        x + (i - (numStrips-1)/2.0) * stripSpacing * c,
-        y + (i - (numStrips-1)/2.0) * stripSpacing * s, ledSpacing,
-        angle, zigzag && (i % 2) == 1);
-    }
-  }
-
-  // Set the location of 64 LEDs arranged in a uniform 8x8 grid.
-  // (x,y) is the center of the grid.
-  void ledGrid8x8(int index, float x, float y, float spacing, float angle, boolean zigzag)
-  {
-    ledGrid(index, 8, 8, x, y, spacing, spacing, angle, zigzag);
   }
 
   // Should the pixel sampling locations be visible? This helps with debugging.
@@ -120,7 +72,7 @@ public class OPC implements Runnable
   {
     enableShowLocations = enabled;
   }
-  
+
   // Enable or disable dithering. Dithering avoids the "stair-stepping" artifact and increases color
   // resolution by quickly jittering between adjacent 8-bit brightness levels about 400 times a second.
   // Dithering is on by default.
@@ -170,7 +122,7 @@ public class OPC implements Runnable
     colorCorrection = "{ \"gamma\": " + gamma + ", \"whitepoint\": [" + red + "," + green + "," + blue + "]}";
     sendColorCorrectionPacket();
   }
-  
+
   // Set custom color correction parameters from a string
   void setColorCorrection(String s)
   {
@@ -185,7 +137,7 @@ public class OPC implements Runnable
       // We'll do this when we reconnect
       return;
     }
- 
+
     byte[] packet = new byte[9];
     packet[0] = 0;          // Channel (reserved)
     packet[1] = (byte)0xFF; // Command (System Exclusive)
@@ -199,7 +151,8 @@ public class OPC implements Runnable
 
     try {
       pending.write(packet);
-    } catch (Exception e) {
+    } 
+    catch (Exception e) {
       dispose();
     }
   }
@@ -231,7 +184,8 @@ public class OPC implements Runnable
     try {
       pending.write(header);
       pending.write(content);
-    } catch (Exception e) {
+    } 
+    catch (Exception e) {
       dispose();
     }
   }
@@ -259,7 +213,7 @@ public class OPC implements Runnable
 
     for (int i = 0; i < numPixels; i++) {
       int pixelLocation = pixelLocations[i];
-      int pixel = pixels[pixelLocation];
+      int pixel = (pixelLocation != -1 ? pixels[pixelLocation] : 0);
 
       packetData[ledAddress] = (byte)(pixel >> 16);
       packetData[ledAddress + 1] = (byte)(pixel >> 8);
@@ -277,7 +231,7 @@ public class OPC implements Runnable
       updatePixels();
     }
   }
-  
+
   // Change the number of pixels in our output packet.
   // This is normally not needed; the output packet is automatically sized
   // by draw() and by setPixel().
@@ -294,7 +248,7 @@ public class OPC implements Runnable
       packetData[3] = (byte)(numBytes & 0xFF);
     }
   }
-  
+
   // Directly manipulate a pixel in the output buffer. This isn't needed
   // for pixels that are mapped to the screen.
   void setPixel(int number, color c)
@@ -308,7 +262,7 @@ public class OPC implements Runnable
     packetData[offset + 1] = (byte) (c >> 8);
     packetData[offset + 2] = (byte) c;
   }
-  
+
   // Read a pixel from the output buffer. If the pixel was mapped to the display,
   // this returns the value we captured on the previous frame.
   color getPixel(int number)
@@ -335,7 +289,8 @@ public class OPC implements Runnable
 
     try {
       output.write(packetData);
-    } catch (Exception e) {
+    } 
+    catch (Exception e) {
       dispose();
     }
   }
@@ -356,9 +311,9 @@ public class OPC implements Runnable
     // Thread tests server connection periodically, attempts reconnection.
     // Important for OPC arrays; faster startup, client continues
     // to run smoothly when mobile servers go in and out of range.
-    for(;;) {
+    for (;; ) {
 
-      if(output == null) { // No OPC connection?
+      if (output == null) { // No OPC connection?
         try {              // Make one!
           socket = new Socket(host, port);
           socket.setTcpNoDelay(true);
@@ -368,9 +323,11 @@ public class OPC implements Runnable
           sendFirmwareConfigPacket();         // rather than 'output' before
           output = pending;                   // rest of code given access.
           // pending not set null, more config packets are OK!
-        } catch (ConnectException e) {
+        } 
+        catch (ConnectException e) {
           dispose();
-        } catch (IOException e) {
+        } 
+        catch (IOException e) {
           dispose();
         }
       }
