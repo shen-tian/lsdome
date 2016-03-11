@@ -21,8 +21,8 @@ void setup()
   size(300, 300, P2D);
   dot = loadImage("dot.png");
   mode = 0;
-  //setupOpc("127.0.0.1");
-  setupOpc("192.168.1.135");
+  setupOpc("127.0.0.1");
+  //setupOpc("192.168.1.135");
   setupMask(1);
   colorMode(HSB, 100);
 }

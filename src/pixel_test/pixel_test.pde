@@ -12,8 +12,8 @@ ArrayList<PVector> points;
 void setup()
 {
   size(300, 300);
-  //setupOpc("127.0.0.1");
-  setupOpc("192.168.1.135");
+  setupOpc("127.0.0.1");
+  //setupOpc("192.168.1.135");
   colorMode(HSB, 100);
 }
 

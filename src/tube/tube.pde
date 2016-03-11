@@ -12,8 +12,8 @@ ArrayList<ArrayList<PVector>> uv;
 void setup()
 {
   size(300, 300);
-  //setupOpc("127.0.0.1");
-  setupOpc("192.168.1.135");
+  setupOpc("127.0.0.1");
+  //setupOpc("192.168.1.135");
   colorMode(HSB, 100);
 }
 
@@ -67,7 +67,7 @@ int getAntialiasedTexture(ArrayList<PVector> sub, float dist) {
 }
 
 void draw() {
-  float t = millis() / 1000.;
+  float t = millis() / 5000.;
   float speed = 10.;
   background(0);
   loadPixels();
