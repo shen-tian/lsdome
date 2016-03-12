@@ -87,6 +87,7 @@ void draw() {
       } else if (line.equals("jog_a dec")) {
         speed /= 1.01;
       }
+      System.out.println(""+speed);
     }
   } catch (IOException e) {
     e.printStackTrace();
@@ -98,13 +99,15 @@ void draw() {
     return;
   }
 
-  pos += speed * (t - last_t);
+  float delta_t = t - last_t;
+  float delta_p = speed * delta_t;
+  pos += delta_p;
   last_t = t;
 
   background(0);
   loadPixels();
   for (int i = 0; i < points.size(); i++) {
-    pixels[opc.pixelLocations[i]] = getAntialiasedTexture(uv.get(i), pos);
+    pixels[opc.pixelLocations[i]] = getAntialiasedTexture(uv.get(i), pos - (float)Math.random()*delta_p);
   }
   updatePixels();
 }
