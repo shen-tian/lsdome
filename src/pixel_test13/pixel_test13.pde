@@ -39,20 +39,24 @@ void draw() {
 
   float t = millis() / 1000.;
 
+  int[] arms = new int[] {4, 4, 4, 1};
+
   background(0);
   loadPixels();
   for (int i = 0; i < points.size(); i++) {
     int panel = i / 120;
-    int arm, px;
-    if (panel == 0) {
-      arm = 0;
-      px = i;
-    } else {
-      // TODO make this logic more robust
-      arm = (panel - 1) / 4 + 1;
-      px = (i - 120) % (120 * 4);
-      panel = (panel - 1) % 4;
+    int xx = 0;
+    int arm0 = 0;
+    int arm;
+    for (arm = 0; arm < arms.length; arm++) {
+      xx += arms[arm];
+      if (panel < xx) {
+        break;
+      }
+      arm0 = xx;
     }
+    panel -= arm0;
+    int px = (i - arm0*120);
     float k = (px - creep_speed * t) / ramp_length;
     setLED(i, color(100 * arm / 4., 50 + 15*panel, 100 * LayoutUtil.fmod(k, 1.)));
   }

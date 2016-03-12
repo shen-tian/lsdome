@@ -9,8 +9,13 @@ OPC opc;
 ArrayList<PVector> points;
 ArrayList<ArrayList<PVector>> uv;
 
+BufferedReader r;
+
 void setup()
 {
+
+  r = createReader("/tmp/pipe");
+
   size(300, 300);
   //setupOpc("127.0.0.1");
   setupOpc("192.168.1.135");
@@ -66,13 +71,40 @@ int getAntialiasedTexture(ArrayList<PVector> sub, float dist) {
   return samples[0];
 }
 
+float pos = 0;
+float last_t = 0;
+float speed = 1.;
+
 void draw() {
+
+  try {
+    while (r.ready()) {
+      String line = r.readLine();
+      System.out.println(line);
+
+      if (line.equals("jog_a inc")) {
+        speed *= 1.01;
+      } else if (line.equals("jog_a dec")) {
+        speed /= 1.01;
+      }
+    }
+  } catch (IOException e) {
+    e.printStackTrace();
+  }
+
   float t = millis() / 1000.;
-  float speed = 10.;
+  if (last_t == 0) {
+    last_t = t;
+    return;
+  }
+
+  pos += speed * (t - last_t);
+  last_t = t;
+
   background(0);
   loadPixels();
   for (int i = 0; i < points.size(); i++) {
-    pixels[opc.pixelLocations[i]] = getAntialiasedTexture(uv.get(i), t*speed);
+    pixels[opc.pixelLocations[i]] = getAntialiasedTexture(uv.get(i), pos);
   }
   updatePixels();
 }

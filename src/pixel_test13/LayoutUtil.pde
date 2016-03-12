@@ -72,15 +72,23 @@ public static class LayoutUtil {
 
   // Fill the 13-panel lsdome configuration
   static ArrayList<PVector> fillLSDome13(int n) {
+    ArrayList<PVector> entries = new ArrayList<PVector>();
+    entries.add(axialToXy(new PVector(1, 0)));
+    entries.add(axialToXy(new PVector(0, 1)));
+    entries.add(axialToXy(new PVector(0, 0)));
     ArrayList<PVector> points = new ArrayList<PVector>();
-    points.addAll(fillTriangle(new PVector(-1/3., -1/3.), 0, n));
-    PVector offset = PVector.sub(axialToXy(new PVector(1., 0.)), axialToXy(new PVector(1/3., 1/3.)));
     for (int i = 0; i < 3; i++) {
       for (PVector p : fillFan(2*i+1, 4, n)) {
-        points.add(PVector.add(p, offset));
+        points.add(PVector.add(p, entries.get(i)));
       }
-      offset.rotate(-2 * PI / 3.);
     }
+    points.addAll(fillTriangle(new PVector(0, 0), 0, n));
+
+    PVector offset = axialToXy(new PVector(-1/3., -1/3.));
+    for (int i = 0; i < points.size(); i++) {
+      points.set(i, PVector.add(points.get(i), offset));
+    }
+
     return points;
   }
 
