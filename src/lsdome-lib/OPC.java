@@ -8,18 +8,18 @@
 
 import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.Arrays;
 import processing.core.*;
 
 public class OPC implements Runnable
 {
+  PApplet app;
   Thread thread;
   Socket socket;
   OutputStream output, pending;
   String host;
   int port;
-
-  PApplet app;
 
   int[] pixelLocations;
   byte[] packetData;
@@ -33,29 +33,28 @@ public class OPC implements Runnable
     this.port = port;
     thread = new Thread(this);
     thread.start();
-    this.enableShowLocations = true;
-    parent.registerDraw(this);
-
+    this.enableShowLocations = false; // TODO pull from 'debug' config param
     this.app = parent;
+    app.registerDraw(this);
   }
 
-  // Set the location of a single LED
-  void led(int index, int x, int y)  
-  {
-    // For convenience, automatically grow the pixelLocations array. We do want this to be an array,
-    // instead of a HashMap, to keep draw() as fast as it can be.
-    if (pixelLocations == null) {
-      pixelLocations = new int[index + 1];
-    } else if (index >= pixelLocations.length) {
-      // TODO why not just use an ArrayList? current behavior is O(n^2)
-      pixelLocations = Arrays.copyOf(pixelLocations, index + 1);
-    }
+  void registerLEDs(ArrayList<PVector> points) {
+      pixelLocations = new int[points.size()];
+      for (int i = 0; i < pixelLocations.length; i++) {
+          PVector p = points.get(i);
+          if (p == null) {
+              pixelLocations[i] = -1;
+              continue;
+          }
 
-    if (x >= 0 && x < app.width && y >= 0 && y < app.height) {
-      pixelLocations[index] = x + app.width * y;
-    } else {
-      pixelLocations[index] = -1;
-    }
+          int x = (int)p.x;
+          int y = (int)p.y;
+          if (x >= 0 && x < app.width && y >= 0 && y < app.height) {
+              pixelLocations[i] = x + app.width * y;
+          } else {
+              pixelLocations[i] = -1;
+          }
+      }
   }
 
   // Should the pixel sampling locations be visible? This helps with debugging.
@@ -190,7 +189,7 @@ public class OPC implements Runnable
   // In that case, you can call setPixelCount(), setPixel(), and writePixels()
   // separately.
   public void draw()
- { 
+  { 
     if (pixelLocations == null) {
       // No pixels defined yet
       return;

@@ -5,8 +5,8 @@ public class MathUtil {
         return ((a % b) + b) % b;
     }
     
-    static float fmod(float a, float b) {
-        float mod = a % b;
+    static double fmod(double a, double b) {
+        double mod = a % b;
         if (mod < 0) {
             mod += b;
         }

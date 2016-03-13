@@ -63,10 +63,11 @@ public class LayoutUtil {
         return transformed;
     }
 
-    static Transform translate(final PVector o) {
+    // Transformation that translates a point by 'offset'
+    static Transform translate(final PVector offset) {
         return new Transform() {
             public PVector transform(PVector p) {
-                return Vadd(p, o);
+                return Vadd(p, offset);
             }
         };
     }
@@ -134,6 +135,10 @@ public class LayoutUtil {
         return points;
     }
     
+    static double panel24Radius() {
+        return 2.;
+    }
+    
     // Fill the 13-panel lsdome configuration
     static ArrayList<PVector> fillLSDome13(int n) {
         final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
@@ -143,6 +148,10 @@ public class LayoutUtil {
         }
         points.addAll(fillTriangle(V(0, 0), 0, n));
         return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
+    }
+
+    static double panel13Radius() {
+        return Math.sqrt(7/3.);  // just trust me
     }
     
     // Convert a 2-vector of (U, V) coordinates from the axial coordinate scheme into (x, y) cartesian coordinates
@@ -165,11 +174,13 @@ public class LayoutUtil {
     
     // For sampling from a rendered screen. Convert led positions from world coordinates to screen pixels and register with
     // the fadecandy(ies).
-    static void registerScreenSamples(OPC opc, ArrayList<PVector> points, int width, int height, double span, boolean horizSpan) {
-        for (int ix = 0; ix < points.size(); ix++) {
-            PVector px = xyToScreen(points.get(ix), width, height, span, horizSpan);
-            opc.led(ix, (int)px.x, (int)px.y);
-        }
+    static void registerScreenSamples(OPC opc, ArrayList<PVector> points,
+                                      final int width, final int height, final double span, final boolean horizSpan) {
+        opc.registerLEDs(transform(points, new Transform() {
+                public PVector transform(PVector p) {
+                    return xyToScreen(p, width, height, span, horizSpan);
+                }
+            }));
     }
     
     // Return the adjacent axial coordinate moving from 'p' in direction 'rot'
@@ -188,4 +199,8 @@ public class LayoutUtil {
         return (du >= -1 && du <= 1 && dv >= -1 && dv <= 1 && du != dv);
     }
     
+    static int pixelsPerPanel(int n) {
+        return n * (n + 1) / 2;
+    }
+
 }
