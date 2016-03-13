@@ -11,7 +11,8 @@ public interface Config {
     static final int PANEL_SIZE = 15;
 
     // Panel configuration.
-    static final PanelLayout PANEL_LAYOUT = PanelLayout._13;
+    static final PanelLayout PANEL_LAYOUT = PanelLayout._2;
+    //static final PanelLayout PANEL_LAYOUT = PanelLayout._13;
     //static final PanelLayout PANEL_LAYOUT = PanelLayout._24;
 
 }

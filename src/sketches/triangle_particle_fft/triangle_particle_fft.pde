@@ -9,19 +9,22 @@ FadecandySketch driver = new FadecandySketch(this, 250, 250);
 
 PImage dot;
 PImage colors;
+PImage colors1;
+PImage colors2;
+PImage colors3;
 Minim minim;
 AudioInput in;
 FFT fft;
 float[] fftFilter;
 
-String filename = "083_trippy-ringysnarebeat-3bars.mp3";
-//String filename = "/Users/Shen/kafkaf.mp3";
+//String filename = "083_trippy-ringysnarebeat-3bars.mp3";
+String filename = "/Users/Shen/kafkaf.mp3";
 float spin = 0.001;
 float radiansPerBucket = radians(2);
 float decay = 0.97;
 float opacity = 40;
 float minSize = 0.1;
-float sizeScale = 0.125;
+float sizeScale = 0.2;
 
 void setup() {
   driver.init();
@@ -35,12 +38,26 @@ void setup() {
   fftFilter = new float[fft.specSize()];
 
   dot = loadImage("dot.png");
-  colors = loadImage("colors.png");
+  colors1 = loadImage("colors.png");
+  colors2 = loadImage("colors2.png");
+  colors3 = loadImage("colors3.png");
+  
+  colors = colors1;
 }
 
 void draw()
 {
   background(0);
+
+  if (keyPressed) {
+    if (key == '1') {
+      colors = colors1;
+    } else if (key == '2') {
+      colors = colors2;
+    } else if (key == '3') {
+      colors = colors3;
+    }
+  }
 
   fft.forward(in.mix);
   for (int i = 0; i < fftFilter.length; i++) {

@@ -1,6 +1,12 @@
 import java.util.*;
 import processing.core.*;
 
+enum PanelLayout {
+    _2,
+    _13,
+    _24
+}
+
 public class LayoutUtil {
     
     /**
@@ -128,39 +134,71 @@ public class LayoutUtil {
         }
         return points;
     }
-    
-    // Fill the 24-panel lsdome configuration
-    static ArrayList<PVector> fillLSDome24(int n) {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        for (int i = 0; i < 6; i++) {
-            points.addAll(fillFan(i, 4, n));
+
+    static abstract class PanelConfig {
+        double radius;  // Max radius of panel configuration, in panel lengths
+        int[] arms;     // Number of panels per fadecandy 'arm'
+
+        public PanelConfig(int num_panels, double radius, int[] arms) {
+            this.radius = radius;
+            this.arms = arms;
+
+            int panel_count = 0;
+            for (int n : arms) {
+                panel_count += n;
+            }
+            assert num_panels == panel_count;
         }
-        return points;
-    }
-    
-    // Fill the 13-panel lsdome configuration
-    static ArrayList<PVector> fillLSDome13(int n) {
-        final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        for (int i = 0; i < 3; i++) {
-            points.addAll(transform(fillFan(2*i+1, 4, n), translate(axialToXy(entries[i]))));
-        }
-        points.addAll(fillTriangle(V(0, 0), 0, n));
-        return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
+
+        // Fill the lsdome configuration with pixels
+        abstract ArrayList<PVector> fill(int n);
     }
 
-    // Return max radius of panel configuration, in panel lengths
-    static double lsDomeRadius(PanelLayout config) {
+    static PanelConfig _2 = new PanelConfig(2,
+                                            2./3.*SQRT_3,
+                                            new int[] {2}) {
+            ArrayList<PVector> fill(int n) {
+                return transform(fillFan(0, 2, n), translate(axialToXy(V(-1/3., -1/3.))));
+            }
+        };
+    static PanelConfig _13 = new PanelConfig(13,
+                                             Math.sqrt(7/3.),  // just trust me
+                                             new int[] {4, 4, 4, 1}) {
+            ArrayList<PVector> fill(int n) {
+                final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
+                ArrayList<PVector> points = new ArrayList<PVector>();
+                for (int i = 0; i < 3; i++) {
+                    points.addAll(transform(fillFan(2*i+1, 4, n), translate(axialToXy(entries[i]))));
+                }
+                points.addAll(fillTriangle(V(0, 0), 0, n));
+                return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
+            }
+        };
+    static PanelConfig _24 = new PanelConfig(24,
+                                             2.,
+                                             new int[] {4, 4, 4, 4, 4, 4}) {
+            ArrayList<PVector> fill(int n) {
+                ArrayList<PVector> points = new ArrayList<PVector>();
+                for (int i = 0; i < 6; i++) {
+                    points.addAll(fillFan(i, 4, n));
+                }
+                return points;
+            }
+        };
+
+    static PanelConfig getPanelConfig(PanelLayout config) {
         switch (config) {
+        case _2:
+            return _2;
         case _13:
-            return Math.sqrt(7/3.);  // just trust me
+            return _13;
         case _24:
-            return 2.;
+            return _24;
         default:
             throw new RuntimeException();
         }
     }
-    
+
     // Convert a 2-vector of (U, V) coordinates from the axial coordinate scheme into (x, y) cartesian coordinates
     static PVector axialToXy(PVector p) {
         PVector U = V(.5, .5 * SQRT_3);

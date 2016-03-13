@@ -1,11 +1,6 @@
 import java.util.*;
 import processing.core.*;
 
-enum PanelLayout {
-    _13,
-    _24
-}
-
 public class FadecandySketch {
 
     static final int COLOR_STEPS = 100;
@@ -37,17 +32,9 @@ public class FadecandySketch {
 
         panel_size = Config.PANEL_SIZE;
         panel_config_mode = Config.PANEL_LAYOUT;
-        switch (panel_config_mode) {
-        case _13:
-            points = LayoutUtil.fillLSDome13(panel_size);
-            break;
-        case _24:
-            points = LayoutUtil.fillLSDome24(panel_size);
-            break;
-        default:
-            throw new RuntimeException();
-        }
-        radius = LayoutUtil.lsDomeRadius(panel_config_mode);
+        LayoutUtil.PanelConfig config = LayoutUtil.getPanelConfig(panel_config_mode);
+        points = config.fill(panel_size);
+        radius = config.radius;
         LayoutUtil.registerScreenSamples(opc, points, width, height, 2*radius, true);
 
         app.colorMode(app.HSB, COLOR_STEPS);

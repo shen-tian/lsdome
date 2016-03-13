@@ -10,17 +10,7 @@ public class PixelTest extends FadecandySketch {
         float creep_speed = 20;
         float ramp_length = 100;
         
-        int[] arms;
-        switch (panel_config_mode) {
-        case _13:
-            arms = new int[] {4, 4, 4, 1};
-            break;
-        case _24:
-            arms = new int[] {4, 4, 4, 4, 4, 4};
-            break;
-        default:
-            throw new RuntimeException();
-        }
+        int[] arms = LayoutUtil.getPanelConfig(panel_config_mode).arms;
         int px_per_panel = LayoutUtil.pixelsPerPanel(panel_size);
 
         app.background(0);
