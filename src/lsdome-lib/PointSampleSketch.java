@@ -67,9 +67,13 @@ public abstract class PointSampleSketch<E> extends FadecandySketch {
             app.pixels[opc.pixelLocations[i]] = sampleAntialiased(points_ir.get(i), t);
         }
         app.updatePixels();
+
+        afterFrame(t);
     }
 
     void beforeFrame(double t) { }
+
+    void afterFrame(double t) { }
 
     int sampleAntialiased(ArrayList<E> sub, double t) {
         int[] samples = new int[sub.size()];
