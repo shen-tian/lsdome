@@ -6,7 +6,7 @@ enum PanelLayout {
     _24
 }
 
-public abstract class FadecandySketch {
+public class FadecandySketch {
 
     PApplet app;
     OPC opc;
@@ -20,7 +20,7 @@ public abstract class FadecandySketch {
     }
 
     void init(int width, int height) {
-        app.size(width, height);
+        app.size(width, height, app.P2D);
 
         String hostname = "127.0.0.1";  // TODO get from config param
         int port = 7890;
@@ -59,7 +59,9 @@ public abstract class FadecandySketch {
         System.out.println(app.frameRate); // TODO make conditional on some debug mode?
     }
 
-    abstract void draw(double t);
+    void draw(double t) {
+        System.out.println("nothing to draw");
+    }
     
     int color(double r, double g, double b) {
         return app.color((float)(100. * r), (float)(100. * g), (float)(100. * b));
