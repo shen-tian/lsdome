@@ -12,7 +12,7 @@ int mode;
 float dx, dy, dz;
 boolean hud;
 
-ArrayList<PVector> points;
+
 
 boolean[] mask;
 
@@ -21,26 +21,75 @@ void setup()
   size(300, 300, P2D);
   dot = loadImage("dot.png");
   mode = 0;
-  //setupOpc("127.0.0.1");
-  setupOpc("192.168.1.135");
-  setupMask(1);
+  configure();
+
   colorMode(HSB, 100);
 }
 
-void setupOpc(String hostname)
+// 
+void configure()
+{
+  JSONObject config = loadJSONObject("config.json");
+
+  String candyserver = config.getString("candyserver");
+  String layout = config.getString("layout");
+
+  setupOpc(candyserver, layout);
+
+  boolean perf = config.getBoolean("perf");
+
+  if (perf)
+    setupMask(1);
+  else
+    setupMask(3);
+}
+
+// Sets up the pixel layout, based on different panel configurations.
+// Not sure if this should be more code or data...
+void setupOpc(String hostname, String layout)
 {
   opc = new OPC(this, hostname, 7890);
   int PANEL_LENGTH = 15;
-  points = LayoutUtil.fillFan(0,2,PANEL_LENGTH);
-  ArrayList<PVector> newPoints = new ArrayList<PVector>();
-  for (PVector p : points)
-  {
-    p.add(-.75,-.5,0);
-    p.mult(2.5);
-    newPoints.add(p);
+
+  ArrayList<PVector> points = null;
+  float viewPortSize = 1;
+
+  if (layout.equals("solo")) {
+    points = LayoutUtil.fillFan(0, 1, PANEL_LENGTH);
+    for (PVector p : points)
+      p.add(-.5, -sqrt(3.)/4., 0);
+    viewPortSize = 1;
   }
-    
-  LayoutUtil.registerScreenSamples(opc, newPoints, width, height, 4., true);
+
+  if (layout.equals("diamond")) {
+    points = LayoutUtil.fillFan(0, 2, PANEL_LENGTH);
+    for (PVector p : points)
+      p.add(-.75, -sqrt(3.)/4., 0);
+    viewPortSize = 1.5;
+  }
+
+  if (layout.equals("trapezium")) {
+    points = LayoutUtil.fillFan(0, 3, PANEL_LENGTH);
+    for (PVector p : points)
+      p.add(-1., -sqrt(3.)/4., 0);
+    viewPortSize = 2;
+  }    
+
+  if (layout.equals("chevron")) {
+    points = LayoutUtil.fillFan(0, 4, PANEL_LENGTH);
+    for (PVector p : points)
+      p.add(-1., 0., 0);
+    viewPortSize = 2;
+  }
+
+  if (layout.equals("hex")) {
+    points = LayoutUtil.fillFan(0, 6, PANEL_LENGTH);
+    for (PVector p : points)
+      p.add(-1., 0., 0);
+    viewPortSize = 2;
+  }  
+
+  LayoutUtil.registerScreenSamples(opc, points, width, height, viewPortSize, true);
 }
 
 void setupMask(float radius)
