@@ -1,3 +1,8 @@
+"""
+Interface with a MIDI control device and dump certain midi events (button presses, slider
+movements, etc.) to stdout to be read by the processing process.
+"""
+
 import pygame
 from pygame.locals import *
 from pygame import midi

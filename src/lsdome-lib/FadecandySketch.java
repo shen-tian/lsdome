@@ -1,3 +1,21 @@
+// Master template for sketches that output to fadecandy. Takes care of common initialization and
+// provides some helper functions.
+
+// Typically the .pde file will simply become:
+/*
+
+FadecandySketch driver = new SubclassOfFadecandySketch(this, <window size>);
+
+void setup() {
+  driver.init();
+}
+
+void draw() {
+  driver.draw();
+}
+
+*/
+
 import java.util.*;
 import processing.core.*;
 
@@ -23,6 +41,8 @@ public class FadecandySketch {
         this.height = height_px;
     }
 
+    // Override this if you have more specific initialization to perform. Be sure to call
+    // super.init()!
     void init() {
         app.size(width, height, app.P2D);
 
@@ -39,7 +59,8 @@ public class FadecandySketch {
 
         app.colorMode(app.HSB, COLOR_STEPS);
     }
-    
+
+    // Write a pixel value to the screen buffer.
     // TODO for sketches that only render pixels directly, is there a cost penalty for going
     // through the screen buffer?
     void setLED(int i, int rgb) {
@@ -56,10 +77,12 @@ public class FadecandySketch {
         }
     }
 
+    // Override this with your sketch's drawing code. 't' is the global clock in seconds.
     void draw(double t) {
         System.out.println("nothing to draw");
     }
     
+    // Helper function to generate a color. r/g/b all in the range [0, 1].
     int color(double r, double g, double b) {
         return app.color((float)(COLOR_STEPS * r), (float)(COLOR_STEPS * g), (float)(COLOR_STEPS * b));
     }

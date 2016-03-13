@@ -135,6 +135,7 @@ public class LayoutUtil {
         return points;
     }
 
+    // All metadata associated with a particular layout of panels.
     static abstract class PanelConfig {
         double radius;  // Max radius of panel configuration, in panel lengths
         int[] arms;     // Number of panels per fadecandy 'arm'

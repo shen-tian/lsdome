@@ -6,7 +6,7 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
     static final double DEFAULT_FOV = 120.;
     static final int DEFAULT_SUBSAMPLING = 4;
 
-    double fov;
+    double fov;  // Aperture from opposite ends of the display area, in degrees.
     BufferedReader input;
 
     double speed = 1.;
@@ -33,6 +33,7 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
         return 1. / LayoutUtil.xyToPolar(p).x;
     }
 
+    // Map xy position to uv coordinates on a cylinder.
     PVector toIntermediateRepresentation(PVector p) {
         // This uses a planar projection, although the dome itself will be slightly curved.
         PVector polar = LayoutUtil.xyToPolar(p);

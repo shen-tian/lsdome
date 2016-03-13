@@ -1,16 +1,36 @@
+// Template for sketches that compute pixel values directly based on their (x,y) position within a
+// a scene. This implies you have a sampling function to render a scene pixel-by-pixel (such as
+// ray-tracing and fractals). It is not for scenes that must be rendered the whole screen at once
+// (i.e., anything using GPU acceleration), nor for 'pixel art'-type scenes where you want to treat
+// the pixels as a discrete grid.
+//
+// Both spatial and temporal anti-aliasing is supported.
+
 import java.util.*;
 import processing.core.*;
 
+// IR is the type of the intermediate representation of the individual points to be sampled/rendered.
+// S is the type of the state that is maintained and updated each frame.
 public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
 
     static final int DEFAULT_BASE_SUBSAMPLING = 1;
     static final int MAX_SUBSAMPLING = 64;
 
+    // Mapping of display pixels to 1 or more actual samples that will be combined to yield that
+    // display pixel's color.
     ArrayList<ArrayList<IR>> points_ir;
+
+    // Ongoing state to be updated each frame (such as positions, directions, etc.).
     S state;
+
+    // Timestamp of the most recent completed frame.
     double last_t;
 
+    // Amount of subsampling for each display pixel.
     int base_subsampling;
+
+    // If true, perform anti-aliasing in the time domain. Combined with subsampling, this will yield
+    // motion blur.
     boolean temporal_jitter;
 
     PointSampleSketch(PApplet app, int size_px) {
@@ -23,6 +43,9 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         this.temporal_jitter = temporal_jitter;        
     }
     
+    // Assign each display pixel to N random samples based on the required amount of subsampling.
+    // Furthermore, each subsample is converted to its intermediate representation to avoid
+    // re-computing it every frame.
     void init() {
         super.init();
 
@@ -49,23 +72,37 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         state = initialState();
     }
 
+    // Convert an xy coordinate in 'panel length' units such that the perimeter of the display area
+    // is the unit circle.
     PVector normalizePoint(PVector p) {
         return LayoutUtil.Vmult(p, 1. / radius);
     }
 
+    // **OVERRIDE** (optional)
+    // We may want to perform more subsampling in certain areas. Return the factor (e.g., 2x, 3x) to
+    // increase subsampling by at the given point.
     double subsamplingBoost(PVector p) {
         return 1.;
     }
 
+    // **OVERRIDE** (optional)
+    // Convert an xy point to be sampled into an intermediate representation, if it would save work
+    // that would otherwise be re-computed each frame. E.g., this is a good place to do texture
+    // mapping.
     IR toIntermediateRepresentation(PVector p) {
         // Default implementation assumes IR is PVector
         return (IR)p;
     }
 
+    // **OVERRIDE** (optional)
+    // Return the initial persistent state.
     S initialState() {
         return null;
     }
 
+    // **OVERRIDE** (optional)
+    // Update the persistent state from one frame to the next. t_delta is the time elapsed since the
+    // previous frame.
     S updateState(S state, double t_delta) {
         return state;
     }
@@ -91,10 +128,15 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         last_t = t;
     }
 
+    // **OVERRIDE** (optional)
+    // A hook to be called before the frame is rendered.
     void beforeFrame(double t) { }
 
+    // **OVERRIDE** (optional)
+    // A hook to be called after the frame is rendered.
     void afterFrame(double t) { }
 
+    // Perform the anti-aliasing for a single display pixel.
     int sampleAntialiased(ArrayList<IR> sub, double t) {
         int[] samples = new int[sub.size()];
         for (int i = 0; i < sub.size(); i++) {
@@ -104,11 +146,14 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         return blendSamples(samples);
     }
 
+    // Render an individual sample. 't' is clock time, including temporal jitter. 't_jitter' is the
+    // amount of jitter added. Return a color.
     abstract int samplePoint(IR ir, double t, double t_jitter);
 
     int blendSamples(int[] samples) {
         int blended = samples[0];
         for (int i = 1; i < samples.length; i++) {
+            //TODO what colorspace does fadecandy use?
             blended = app.lerpColor(blended, samples[i], (float)(1. / (1. + i)));
         }
         return blended;

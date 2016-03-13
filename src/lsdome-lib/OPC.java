@@ -38,6 +38,7 @@ public class OPC implements Runnable
     app.registerDraw(this);
   }
 
+  // Mark the screen xy coordinates in 'points' as pixels 0..(n-1)
   void registerLEDs(ArrayList<PVector> points) {
       pixelLocations = new int[points.size()];
       for (int i = 0; i < pixelLocations.length; i++) {
