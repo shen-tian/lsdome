@@ -60,20 +60,22 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
     }
 
     void beforeFrame(double t) {
-        try {
-            while (input.ready()) {
-                String line = input.readLine();
-                System.out.println(line);
-                
-                if (line.equals("jog_a inc")) {
-                    speed *= 1.01;
-                } else if (line.equals("jog_a dec")) {
-                    speed /= 1.01;
+        if (input != null) {
+            try {
+                while (input.ready()) {
+                    String line = input.readLine();
+                    System.out.println(line);
+                    
+                    if (line.equals("jog_a inc")) {
+                        speed *= 1.01;
+                    } else if (line.equals("jog_a dec")) {
+                        speed /= 1.01;
+                    }
+                    System.out.println(""+speed);
                 }
-                System.out.println(""+speed);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 
