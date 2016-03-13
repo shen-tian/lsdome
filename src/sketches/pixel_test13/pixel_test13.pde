@@ -58,7 +58,7 @@ void draw() {
     panel -= arm0;
     int px = (i - arm0*120);
     float k = (px - creep_speed * t) / ramp_length;
-    setLED(i, color(100 * arm / 4., 50 + 15*panel, 100 * LayoutUtil.fmod(k, 1.)));
+    setLED(i, color(100 * arm / 4., 50 + 15*panel, 100 * MathUtil.fmod(k, 1.)));
   }
   updatePixels();
 }
