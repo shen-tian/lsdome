@@ -4,10 +4,10 @@
  * are evaluated directly (with antialiasing support) and written to the screen solely for visualization.
  */
 
-TubeSketch driver = new TubeSketch(this);
+TubeSketch driver = new TubeSketch(this, 300);
 
 void setup() {
-  driver.init(300, 300, 4, true);
+  driver.init();
 }
 
 void draw() {

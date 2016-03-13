@@ -2,10 +2,10 @@ import processing.core.*;
 
 public class PixelTest extends FadecandySketch {
 
-    PixelTest(PApplet app) {
-        super(app);
+    public PixelTest(PApplet app, int size_px) {
+        super(app, size_px);
     }
-    
+
     void draw(double t) {
         float creep_speed = 20;
         float ramp_length = 100;

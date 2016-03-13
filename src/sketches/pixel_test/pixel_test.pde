@@ -5,10 +5,10 @@
  * individual pixels progress in a marching ants pattern.
  */
 
-FadecandySketch driver = new PixelTest(this);
+FadecandySketch driver = new PixelTest(this, 300);
 
 void setup() {
-  driver.init(300, 300);
+  driver.init();
 }
 
 void draw() {

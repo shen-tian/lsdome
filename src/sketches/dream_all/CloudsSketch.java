@@ -10,8 +10,8 @@ public class CloudsSketch extends PointSampleSketch<PVector> {
     double noiseScale=0.02;
     double last_t = 0;
 
-    CloudsSketch(PApplet app) {
-        super(app);
+    CloudsSketch(PApplet app, int size_px) {
+        super(app, size_px);
 
         mode = 0;
     }

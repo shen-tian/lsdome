@@ -4,6 +4,7 @@ import processing.core.*;
 public class TubeSketch extends PointSampleSketch<PVector> {
 
     static final double DEFAULT_FOV = 120.;
+    static final int DEFAULT_SUBSAMPLING = 4;
 
     double fov;
     BufferedReader input;
@@ -12,14 +13,22 @@ public class TubeSketch extends PointSampleSketch<PVector> {
     double last_t = 0;
     double speed = 1.;
 
-    TubeSketch(PApplet app, double fov) {
-        super(app);
+    TubeSketch(PApplet app, double fov, int size_px, int subsampling, boolean temporal_jitter) {
+        super(app, size_px, subsampling, temporal_jitter);
         this.fov = fov;
         input = app.createReader("/tmp/pipe");
     }
 
-    TubeSketch(PApplet app) {
-        this(app, DEFAULT_FOV);
+    TubeSketch(PApplet app, int size_px, double fov) {
+        this(app, fov, size_px, DEFAULT_SUBSAMPLING, true);
+    }
+
+    TubeSketch(PApplet app, int size_px, int subsampling, boolean temporal_jitter) {
+        this(app, DEFAULT_FOV, size_px, subsampling, temporal_jitter);
+    }
+
+    TubeSketch(PApplet app, int size_px) {
+        this(app, size_px, DEFAULT_FOV);
     }
 
     double subsamplingBoost(PVector p) {

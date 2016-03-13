@@ -5,7 +5,7 @@
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 
-FadecandySketch driver = new FadecandySketch(this);
+FadecandySketch driver = new FadecandySketch(this, 250, 250);
 
 PImage dot;
 PImage colors;
@@ -24,7 +24,7 @@ float minSize = 0.1;
 float sizeScale = 0.125;
 
 void setup() {
-  driver.init(250, 250);
+  driver.init();
 
   minim = new Minim(this); 
 

@@ -3,26 +3,25 @@ import processing.core.*;
 
 public abstract class PointSampleSketch<E> extends FadecandySketch {
 
-    final int DEFAULT_BASE_SUBSAMPLING = 1;
-    final int MAX_SUBSAMPLING = 64;
+    static final int DEFAULT_BASE_SUBSAMPLING = 1;
+    static final int MAX_SUBSAMPLING = 64;
 
     ArrayList<ArrayList<E>> points_ir;
     int base_subsampling;
     boolean temporal_jitter;
 
-    PointSampleSketch(PApplet app) {
-        super(app);
+    PointSampleSketch(PApplet app, int size_px) {
+        this(app, size_px, DEFAULT_BASE_SUBSAMPLING, false);
+    }
+
+    PointSampleSketch(PApplet app, int size_px, int base_subsampling, boolean temporal_jitter) {
+        super(app, size_px);
+        this.base_subsampling = base_subsampling;
+        this.temporal_jitter = temporal_jitter;        
     }
     
-    void init(int width, int height) {
-        init(width, height, DEFAULT_BASE_SUBSAMPLING, false);
-    }
-
-    void init(int width, int height, int base_subsampling, boolean temporal_jitter) {
-        super.init(width, height);
-
-        this.base_subsampling = base_subsampling;
-        this.temporal_jitter = temporal_jitter;
+    void init() {
+        super.init();
 
         points_ir = new ArrayList<ArrayList<E>>();
         for (PVector p : points) {

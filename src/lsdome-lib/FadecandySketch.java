@@ -11,17 +11,24 @@ public class FadecandySketch {
     static final int COLOR_STEPS = 100;
 
     PApplet app;
+    int width, height;
     OPC opc;
     ArrayList<PVector> points;
     int panel_size;
     PanelLayout panel_config_mode;
     double radius;
 
-    FadecandySketch(PApplet app) {
-        this.app = app;
+    FadecandySketch(PApplet app, int size_px) {
+        this(app, size_px, size_px);
     }
 
-    void init(int width, int height) {
+    FadecandySketch(PApplet app, int width_px, int height_px) {
+        this.app = app;
+        this.width = width_px;
+        this.height = height_px;
+    }
+
+    void init() {
         app.size(width, height, app.P2D);
 
         String hostname = "127.0.0.1";  // TODO get from config param
