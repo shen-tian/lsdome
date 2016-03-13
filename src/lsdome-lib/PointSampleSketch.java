@@ -1,12 +1,15 @@
 import java.util.*;
 import processing.core.*;
 
-public abstract class PointSampleSketch<E> extends FadecandySketch {
+public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
 
     static final int DEFAULT_BASE_SUBSAMPLING = 1;
     static final int MAX_SUBSAMPLING = 64;
 
-    ArrayList<ArrayList<E>> points_ir;
+    ArrayList<ArrayList<IR>> points_ir;
+    S state;
+    double last_t;
+
     int base_subsampling;
     boolean temporal_jitter;
 
@@ -23,9 +26,9 @@ public abstract class PointSampleSketch<E> extends FadecandySketch {
     void init() {
         super.init();
 
-        points_ir = new ArrayList<ArrayList<E>>();
+        points_ir = new ArrayList<ArrayList<IR>>();
         for (PVector p : points) {
-            ArrayList<E> samples = new ArrayList<E>();
+            ArrayList<IR> samples = new ArrayList<IR>();
             points_ir.add(samples);
 
             p = normalizePoint(p);
@@ -42,6 +45,8 @@ public abstract class PointSampleSketch<E> extends FadecandySketch {
                 samples.add(toIntermediateRepresentation(sample));
             }
         }
+
+        state = initialState();
     }
 
     PVector normalizePoint(PVector p) {
@@ -52,12 +57,21 @@ public abstract class PointSampleSketch<E> extends FadecandySketch {
         return 1.;
     }
 
-    E toIntermediateRepresentation(PVector p) {
-        // Default implementation assumes E is PVector
-        return (E)p;
+    IR toIntermediateRepresentation(PVector p) {
+        // Default implementation assumes IR is PVector
+        return (IR)p;
+    }
+
+    S initialState() {
+        return null;
+    }
+
+    S updateState(S state, double t_delta) {
+        return state;
     }
 
     void draw(double t) {
+        _updateState(t);
         beforeFrame(t);
 
         app.background(0);
@@ -70,20 +84,27 @@ public abstract class PointSampleSketch<E> extends FadecandySketch {
         afterFrame(t);
     }
 
+    void _updateState(double t) {
+        if (last_t > 0) {
+            state = updateState(state, t - last_t);
+        }
+        last_t = t;
+    }
+
     void beforeFrame(double t) { }
 
     void afterFrame(double t) { }
 
-    int sampleAntialiased(ArrayList<E> sub, double t) {
+    int sampleAntialiased(ArrayList<IR> sub, double t) {
         int[] samples = new int[sub.size()];
         for (int i = 0; i < sub.size(); i++) {
             double t_jitter = (temporal_jitter ? (Math.random() - .5) / app.frameRate : 0.);
-            samples[i] = samplePoint(sub.get(i), t + t_jitter);
+            samples[i] = samplePoint(sub.get(i), t + t_jitter, t_jitter);
         }
         return blendSamples(samples);
     }
 
-    abstract int samplePoint(E ir, double t);
+    abstract int samplePoint(IR ir, double t, double t_jitter);
 
     int blendSamples(int[] samples) {
         int blended = samples[0];

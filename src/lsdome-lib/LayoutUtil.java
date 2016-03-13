@@ -16,22 +16,27 @@ public class LayoutUtil {
 
     // Convenience methods to make vector math easier. Input arguments are treated as constants.
 
+    // Create a new vector (x, y)
     static PVector V(double x, double y) {
         return new PVector((float)x, (float)y);
     }
 
+    // Clone a vector
     static PVector V(PVector v) {
         return V(v.x, v.y);
     }
 
+    // Return a + b
     static PVector Vadd(PVector a, PVector b) {
         return PVector.add(a, b);
     }
 
+    // Return k * a
     static PVector Vmult(PVector v, double k) {
         return PVector.mult(v, (float)k);
     }
 
+    // Return v rotated counter-clockwise by theta radians
     static PVector Vrot(PVector v, double theta) {
         PVector rot = V(v);
         rot.rotate((float)theta);
@@ -133,10 +138,6 @@ public class LayoutUtil {
         return points;
     }
     
-    static double panel24Radius() {
-        return 2.;
-    }
-    
     // Fill the 13-panel lsdome configuration
     static ArrayList<PVector> fillLSDome13(int n) {
         final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
@@ -148,8 +149,16 @@ public class LayoutUtil {
         return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
     }
 
-    static double panel13Radius() {
-        return Math.sqrt(7/3.);  // just trust me
+    // Return max radius of panel configuration, in panel lengths
+    static double lsDomeRadius(PanelLayout config) {
+        switch (config) {
+        case _13:
+            return Math.sqrt(7/3.);  // just trust me
+        case _24:
+            return 2.;
+        default:
+            throw new RuntimeException();
+        }
     }
     
     // Convert a 2-vector of (U, V) coordinates from the axial coordinate scheme into (x, y) cartesian coordinates
@@ -170,10 +179,12 @@ public class LayoutUtil {
         return Vadd(basisTransform(p, U, V), offset);
     }
 
+    // Convert (x, y) coordinate to polar coordinates (radius, theta [counter-clockwise])
     static PVector xyToPolar(PVector p) {
         return V(p.mag(), Math.atan2(p.y, p.x));
     }
 
+    // Convert polar coordinates (radius, theta [counter-clockwise]) to cartesian (x, y)
     static PVector polarToXy(PVector p) {
         double r = p.x;
         double theta = p.y;
@@ -207,6 +218,7 @@ public class LayoutUtil {
         return (du >= -1 && du <= 1 && dv >= -1 && dv <= 1 && du != dv);
     }
     
+    // Number of pixels in a single panel of size n
     static int pixelsPerPanel(int n) {
         return n * (n + 1) / 2;
     }

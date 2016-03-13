@@ -1,7 +1,7 @@
 import java.io.*;
 import processing.core.*;
 
-public class TubeSketch extends PointSampleSketch<PVector> {
+public class TubeSketch extends PointSampleSketch<PVector, Double> {
 
     static final double DEFAULT_FOV = 120.;
     static final int DEFAULT_SUBSAMPLING = 4;
@@ -9,8 +9,6 @@ public class TubeSketch extends PointSampleSketch<PVector> {
     double fov;
     BufferedReader input;
 
-    double pos = 0;
-    double last_t = 0;
     double speed = 1.;
 
     TubeSketch(PApplet app, double fov, int size_px, int subsampling, boolean temporal_jitter) {
@@ -36,19 +34,29 @@ public class TubeSketch extends PointSampleSketch<PVector> {
     }
 
     PVector toIntermediateRepresentation(PVector p) {
+        // This uses a planar projection, although the dome itself will be slightly curved.
         PVector polar = LayoutUtil.xyToPolar(p);
         return LayoutUtil.V(polar.y, 1. / Math.tan(Math.toRadians(.5*fov)) / polar.x);
     }
 
-    int samplePoint(PVector uv, double t) {
-        double pos = this.pos + speed*(t - last_t);
+    Double initialState() {
+        return 0.;
+    }
+
+    Double updateState(Double pos, double delta_t) {
+        return pos + speed * delta_t;
+    }
+
+    int samplePoint(PVector uv, double t, double t_jitter) {
+        double pos0 = state;
+        double pos = pos0 + speed * t_jitter;
 
         double u_pct = MathUtil.fmod(uv.x / (2*Math.PI), 1.);
-        t = uv.y + pos;
-        //boolean chk = ((int)MathUtil.fmod((uv.x + t)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((uv.x - t)/(.25*Math.PI), 2.)) % 2 == 0;
-        boolean chk = ((int)MathUtil.fmod((uv.x)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((t)/(.25*Math.PI), 2.)) % 2 == 0;
-        //boolean chk = (MathUtil.fmod((uv.x + t) / Math.PI, 2.) < 1.);
-        return color(MathUtil.fmod(u_pct + t/10., 1.), .5, chk ? 1 : .1);
+        double dist = uv.y + pos;
+        //boolean chk = ((int)MathUtil.fmod((uv.x + dist)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((uv.x - dist)/(.25*Math.PI), 2.)) % 2 == 0;
+        boolean chk = ((int)MathUtil.fmod((uv.x)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((dist)/(.25*Math.PI), 2.)) % 2 == 0;
+        //boolean chk = (MathUtil.fmod((uv.x + dist) / Math.PI, 2.) < 1.);
+        return color(MathUtil.fmod(u_pct + dist/10., 1.), .5, chk ? 1 : .05);
     }
 
     void beforeFrame(double t) {
@@ -67,14 +75,6 @@ public class TubeSketch extends PointSampleSketch<PVector> {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        
-        // TODO on init?
-
-        double delta_t = t - last_t;
-        double delta_p = speed * delta_t;
-        pos += delta_p;
-        last_t = t;
-        
     }
 
 }

@@ -40,15 +40,14 @@ public class FadecandySketch {
         switch (panel_config_mode) {
         case _13:
             points = LayoutUtil.fillLSDome13(panel_size);
-            radius = LayoutUtil.panel13Radius();
             break;
         case _24:
             points = LayoutUtil.fillLSDome24(panel_size);
-            radius = LayoutUtil.panel24Radius();
             break;
         default:
             throw new RuntimeException();
         }
+        radius = LayoutUtil.lsDomeRadius(panel_config_mode);
         LayoutUtil.registerScreenSamples(opc, points, width, height, 2*radius, true);
 
         app.colorMode(app.HSB, COLOR_STEPS);
