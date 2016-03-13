@@ -12,8 +12,8 @@ ArrayList<ArrayList<PVector>> uv;
 void setup()
 {
   size(300, 300);
-  setupOpc("127.0.0.1");
-  //setupOpc("192.168.1.135");
+  //setupOpc("127.0.0.1");
+  setupOpc("192.168.1.135");
   colorMode(HSB, 100);
 }
 
@@ -22,10 +22,18 @@ float FOV = 120;
 
 void setupOpc(String hostname)
 {
-  opc = new OPC(this, hostname, 7890);
+opc = new OPC(this, hostname, 7890);
   int PANEL_LENGTH = 15;
-  points = LayoutUtil.fillLSDome(PANEL_LENGTH);
-  LayoutUtil.registerScreenSamples(opc, points, width, height, 4., true);
+  points = LayoutUtil.fillFan(0,2,PANEL_LENGTH);
+  ArrayList<PVector> newPoints = new ArrayList<PVector>();
+  for (PVector p : points)
+  {
+    p.add(-.75,-.5,0);
+    p.mult(2.5);
+    newPoints.add(p);
+  }
+    
+  LayoutUtil.registerScreenSamples(opc, newPoints, width, height, 4., true);
 
   uv = new ArrayList<ArrayList<PVector>>();
   for (int i = 0; i < points.size(); i++) {
@@ -67,7 +75,7 @@ int getAntialiasedTexture(ArrayList<PVector> sub, float dist) {
 }
 
 void draw() {
-  float t = millis() / 5000.;
+  float t = millis() / 3000.;
   float speed = 10.;
   background(0);
   loadPixels();

@@ -16,6 +16,8 @@ AudioInput in;
 FFT fft;
 float[] fftFilter;
 
+ArrayList<PVector> points;
+
 //String filename = "083_trippy-ringysnarebeat-3bars.mp3";
 String filename = "/Users/Shen/kafkaf.mp3";
 float spin = 0.001;
@@ -44,34 +46,23 @@ void setup()
   
   colors = colors1;
 
-  // Connect to the local instance of fcserver
-  opc = new OPC(this, "192.168.1.135", 7890);
-  //opc = new OPC(this, "127.0.0.1", 7890);
+  setupOpc("192.168.1.135");
+}
 
-  int n = 15;
-
-  float spacing = width / (2 * n);
-
-  float heightTotal = spacing * (n - 1) * sqrt(3) / 2.0;
-  float distToCentroid = spacing * (n - 1) / (2.0 * sqrt(3));
-
-  float theta = (float) Math.PI / 3;
-  float centerX = width / 2;
-  float centerY = height / 2 - heightTotal / 2 + distToCentroid;
-
-  opc.ledTriangle(120, n, centerX, centerY, spacing, theta, false);
-
-  theta = (float) (0 * Math.PI / 3);
-  centerX = width / 2 - width / 4;
-  centerY = height / 2 + heightTotal / 2 - distToCentroid;
-  opc.ledTriangle(0, n, centerX, centerY, spacing, theta, false);
-
-  centerX = width / 2 + width / 4;
-  centerY = height / 2 + heightTotal / 2 - distToCentroid;
-  theta += (float) 2 * Math.PI / 3;
-  opc.ledTriangle(360, n, centerX, centerY, spacing, theta, false);
-  // Make the status LED quiet
-  opc.setStatusLed(false);
+void setupOpc(String hostname)
+{
+  opc = new OPC(this, hostname, 7890);
+  int PANEL_LENGTH = 15;
+  points = LayoutUtil.2(0,2,PANEL_LENGTH);
+  ArrayList<PVector> newPoints = new ArrayList<PVector>();
+  for (PVector p : points)
+  {
+    p.add(-.75,-.5,0);
+    p.mult(2.5);
+    newPoints.add(p);
+  }
+    
+  LayoutUtil.registerScreenSamples(opc, newPoints, width, height, 4., true);
 }
 
 void draw()

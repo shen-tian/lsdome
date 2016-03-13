@@ -12,7 +12,7 @@ int mode;
 float dx, dy, dz;
 boolean hud;
 
-
+ArrayList<PVector> points;
 
 boolean[] mask;
 
@@ -21,8 +21,8 @@ void setup()
   size(300, 300, P2D);
   dot = loadImage("dot.png");
   mode = 0;
-  setupOpc("127.0.0.1");
-  //setupOpc("192.168.1.135");
+  //setupOpc("127.0.0.1");
+  setupOpc("192.168.1.135");
   setupMask(1);
   colorMode(HSB, 100);
 }
@@ -31,7 +31,16 @@ void setupOpc(String hostname)
 {
   opc = new OPC(this, hostname, 7890);
   int PANEL_LENGTH = 15;
-  LayoutUtil.registerScreenSamples(opc, LayoutUtil.fillLSDome(PANEL_LENGTH), width, height, 4., true);
+  points = LayoutUtil.fillFan(0,2,PANEL_LENGTH);
+  ArrayList<PVector> newPoints = new ArrayList<PVector>();
+  for (PVector p : points)
+  {
+    p.add(-.75,-.5,0);
+    p.mult(2.5);
+    newPoints.add(p);
+  }
+    
+  LayoutUtil.registerScreenSamples(opc, newPoints, width, height, 4., true);
 }
 
 void setupMask(float radius)
