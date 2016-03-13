@@ -155,6 +155,7 @@ public class LayoutUtil {
         abstract ArrayList<PVector> fill(int n);
     }
 
+    // Note: this layout is off-center.
     static PanelConfig _2 = new PanelConfig(2,
                                             2./3.*SQRT_3,
                                             new int[] {2}) {

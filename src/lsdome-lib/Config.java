@@ -1,3 +1,5 @@
+// Global configuration variables.
+
 public interface Config {
 
     // Debug mode.
@@ -15,4 +17,8 @@ public interface Config {
     //static final PanelLayout PANEL_LAYOUT = PanelLayout._13;
     //static final PanelLayout PANEL_LAYOUT = PanelLayout._24;
 
+    // If true, size the panels as if they were part of a larger layout.
+    static final boolean PARTIAL_LAYOUT = false;
+    // The larger layout. Ignored if PARTIAL_LAYOUT is false.
+    static final PanelLayout FULL_PANEL_LAYOUT = PanelLayout._24;
 }

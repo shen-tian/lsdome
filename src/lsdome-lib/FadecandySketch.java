@@ -54,7 +54,10 @@ public class FadecandySketch {
         panel_config_mode = Config.PANEL_LAYOUT;
         LayoutUtil.PanelConfig config = LayoutUtil.getPanelConfig(panel_config_mode);
         points = config.fill(panel_size);
-        radius = config.radius;
+        radius = (Config.PARTIAL_LAYOUT ?
+                    LayoutUtil.getPanelConfig(Config.FULL_PANEL_LAYOUT) :
+                    config
+                  ).radius;
         LayoutUtil.registerScreenSamples(opc, points, width, height, 2*radius, true);
 
         app.colorMode(app.HSB, COLOR_STEPS);
