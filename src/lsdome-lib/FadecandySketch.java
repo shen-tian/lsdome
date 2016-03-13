@@ -31,12 +31,12 @@ public class FadecandySketch {
     void init() {
         app.size(width, height, app.P2D);
 
-        String hostname = "127.0.0.1";  // TODO get from config param
+        String hostname = Config.FADECANDY_HOST;
         int port = 7890;
         opc = new OPC(app, hostname, port);
 
-        panel_size = 15; // TODO get from config param
-        panel_config_mode = PanelLayout._13; // TODO get from config param
+        panel_size = Config.PANEL_SIZE;
+        panel_config_mode = Config.PANEL_LAYOUT;
         switch (panel_config_mode) {
         case _13:
             points = LayoutUtil.fillLSDome13(panel_size);
@@ -64,7 +64,9 @@ public class FadecandySketch {
 
     void draw() {
         draw(app.millis() / 1000.);
-        System.out.println(app.frameRate); // TODO make conditional on some debug mode?
+        if (Config.DEBUG) {
+            System.out.println(app.frameRate);
+        }
     }
 
     void draw(double t) {

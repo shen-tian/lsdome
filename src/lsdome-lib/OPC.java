@@ -33,7 +33,7 @@ public class OPC implements Runnable
     this.port = port;
     thread = new Thread(this);
     thread.start();
-    this.enableShowLocations = false; // TODO pull from 'debug' config param
+    this.enableShowLocations = Config.DEBUG;
     this.app = parent;
     app.registerDraw(this);
   }
