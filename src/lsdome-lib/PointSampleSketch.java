@@ -50,6 +50,7 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         super.init();
 
         points_ir = new ArrayList<ArrayList<IR>>();
+        int total_subsamples = 0;
         for (PVector p : points) {
             ArrayList<IR> samples = new ArrayList<IR>();
             points_ir.add(samples);
@@ -67,9 +68,14 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
                 PVector sample = LayoutUtil.Vadd(p, offset);
                 samples.add(toIntermediateRepresentation(sample));
             }
+
+            total_subsamples += num_subsamples;
         }
 
         state = initialState();
+
+        System.out.println(String.format("%d subsamples for %d pixels (%.1f samples/pixel)",
+                                         total_subsamples, points.size(), (double)total_subsamples / points.size()));
     }
 
     // Convert an xy coordinate in 'panel length' units such that the perimeter of the display area
