@@ -158,16 +158,6 @@ void drawRings() {
   updatePixels();
 }
 
-void drawDot() {
-  background(0);
-
-  // Change the dot size as a function of time, to make it "throb"
-  float dotSize = height * 0.6 * (1.0 + 0.2 * sin(millis() * 0.01));
-
-  // Draw it centered at the mouse location
-  image(dot, mouseX - dotSize/2, mouseY - dotSize/2, dotSize, dotSize);
-}
-
 
 void draw() {
 
@@ -188,8 +178,6 @@ void draw() {
     drawRings();
   if (mode == 0)
     drawCloud();
-  if (mode ==2)
-    drawDot();
 
   if (hud)
   {

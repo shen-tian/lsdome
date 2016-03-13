@@ -169,7 +169,17 @@ public class LayoutUtil {
         PVector offset = V(.5 * width, .5 * height);
         return Vadd(basisTransform(p, U, V), offset);
     }
-    
+
+    static PVector xyToPolar(PVector p) {
+        return V(p.mag(), Math.atan2(p.y, p.x));
+    }
+
+    static PVector polarToXy(PVector p) {
+        double r = p.x;
+        double theta = p.y;
+        return Vrot(V(r, 0), theta);
+    }
+
     // For sampling from a rendered screen. Convert led positions from world coordinates to screen pixels and register with
     // the fadecandy(ies).
     static void registerScreenSamples(OPC opc, ArrayList<PVector> points,

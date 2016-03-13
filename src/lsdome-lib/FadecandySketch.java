@@ -8,6 +8,8 @@ enum PanelLayout {
 
 public class FadecandySketch {
 
+    static final int COLOR_STEPS = 100;
+
     PApplet app;
     OPC opc;
     ArrayList<PVector> points;
@@ -42,7 +44,7 @@ public class FadecandySketch {
         }
         LayoutUtil.registerScreenSamples(opc, points, width, height, 2*radius, true);
 
-        app.colorMode(app.HSB, 100);
+        app.colorMode(app.HSB, COLOR_STEPS);
     }
     
     // TODO for sketches that only render pixels directly, is there a cost penalty for going
@@ -64,7 +66,7 @@ public class FadecandySketch {
     }
     
     int color(double r, double g, double b) {
-        return app.color((float)(100. * r), (float)(100. * g), (float)(100. * b));
+        return app.color((float)(COLOR_STEPS * r), (float)(COLOR_STEPS * g), (float)(COLOR_STEPS * b));
     }
 
 }
