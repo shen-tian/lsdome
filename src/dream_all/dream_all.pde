@@ -88,8 +88,32 @@ void setupOpc(String hostname, String layout)
       p.add(-1., 0., 0);
     viewPortSize = 2;
   }  
+  
+  generateOPCSimLayout(points, "data/" + layout + ".json");
 
   LayoutUtil.registerScreenSamples(opc, points, width, height, viewPortSize, true);
+}
+
+// Generates the JSON config file for OPC simulator
+void generateOPCSimLayout(ArrayList<PVector> points, String fileName)
+{
+    JSONArray values = new JSONArray();
+
+  for (int i = 0; i < points.size(); i++) {
+
+    JSONObject point = new JSONObject();
+
+    float[] coordinates = new float[3];
+    coordinates[0] = 2 * points.get(i).x;
+    coordinates[1] = 2 * points.get(i).y;
+    coordinates[2] = 2 * points.get(i).z;
+
+    point.setJSONArray("point", new JSONArray(new FloatList(coordinates)));
+    
+    values.setJSONObject(i, point);
+  }
+
+  saveJSONArray(values, fileName);
 }
 
 void setupMask(float radius)
