@@ -9,7 +9,7 @@ PROCESSING_DIR=$1  # Directory of the processing install (containing core/, java
 SRC_DIR=$2  # src/ directory of lsdome repo 
 
 TEMPDIR=$(mktemp -d)
-javac -cp $PROCESSING_DIR/core/library/core.jar -d $TEMPDIR $SRC_DIR/lsdome-lib/*.java
+javac -target 1.6 -source 1.6 -cp $PROCESSING_DIR/core/library/core.jar -d $TEMPDIR $SRC_DIR/lsdome-lib/*.java
 TEMPFILE=$(mktemp)
 jar cf $TEMPFILE -C $TEMPDIR .
-cp $TEMPFILE $PROCESSING_DIR/lib/lsdome-lib.jar
+cp $TEMPFILE $PROCESSING_DIR/lib/lsdomeLib.jar
