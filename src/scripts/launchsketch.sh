@@ -2,8 +2,11 @@
 
 # Launch a sketch in a failsafe manner
 
+# Note that processing-java somehow needs the absolute and not relative path, at least
+# under OSX. `pwd` does the trick though.
+
 # Example:
-# ./src/scripts/launchsketch.sh ~/processing-2.2.1 src/ pixel_test
+# ./src/scripts/launchsketch.sh ~/processing-2.2.1 `pwd`/src/ pixel_test
 
 PROCESSING_DIR=$1  # Directory of the processing install (containing core/, java/, lib/, etc.)
 SRC_DIR=$2  # src/ directory of lsdome repo 
