@@ -116,7 +116,7 @@ void setupMask(float radius)
   }
 }
 
-float noiseScale=0.02;
+
 
 float fractalNoise(float x, float y, float z) {
   float r = 0;
