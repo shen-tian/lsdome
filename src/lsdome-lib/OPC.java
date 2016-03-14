@@ -6,11 +6,15 @@
  * This file is released into the public domain.
  */
 
+import java.io.*;
 import java.net.*;
+import java.util.*;
 import java.util.Arrays;
+import processing.core.*;
 
 public class OPC implements Runnable
 {
+  PApplet app;
   Thread thread;
   Socket socket;
   OutputStream output, pending;
@@ -29,39 +33,29 @@ public class OPC implements Runnable
     this.port = port;
     thread = new Thread(this);
     thread.start();
-    this.enableShowLocations = true;
-    parent.registerDraw(this);
+    this.enableShowLocations = Config.DEBUG;
+    this.app = parent;
+    app.registerDraw(this);
   }
 
-  // Set the location of a single LED
-  void led(int index, int x, int y)  
-  {
-    // For convenience, automatically grow the pixelLocations array. We do want this to be an array,
-    // instead of a HashMap, to keep draw() as fast as it can be.
-    if (pixelLocations == null) {
-      pixelLocations = new int[index + 1];
-    } else if (index >= pixelLocations.length) {
-      // TODO why not just use an ArrayList? current behavior is O(n^2)
-      pixelLocations = Arrays.copyOf(pixelLocations, index + 1);
-    }
+  // Mark the screen xy coordinates in 'points' as pixels 0..(n-1)
+  void registerLEDs(ArrayList<PVector> points) {
+      pixelLocations = new int[points.size()];
+      for (int i = 0; i < pixelLocations.length; i++) {
+          PVector p = points.get(i);
+          if (p == null) {
+              pixelLocations[i] = -1;
+              continue;
+          }
 
-    if (x >= 0 && x < width && y >= 0 && y < height) {
-      pixelLocations[index] = x + width * y;
-    } else {
-      pixelLocations[index] = -1;
-    }
-  }
-
-  // Set the locations of a ring of LEDs. The center of the ring is at (x, y),
-  // with "radius" pixels between the center and each LED. The first LED is at
-  // the indicated angle, in radians, measured clockwise from +X.
-  void ledRing(int index, int count, float x, float y, float radius, float angle)
-  {
-    for (int i = 0; i < count; i++) {
-      float a = angle + i * 2 * PI / count;
-      led(index + i, (int)(x - radius * cos(a) + 0.5), 
-      (int)(y - radius * sin(a) + 0.5));
-    }
+          int x = (int)p.x;
+          int y = (int)p.y;
+          if (x >= 0 && x < app.width && y >= 0 && y < app.height) {
+              pixelLocations[i] = x + app.width * y;
+          } else {
+              pixelLocations[i] = -1;
+          }
+      }
   }
 
   // Should the pixel sampling locations be visible? This helps with debugging.
@@ -195,8 +189,8 @@ public class OPC implements Runnable
   // If you aren't using that mapping, this function has no effect.
   // In that case, you can call setPixelCount(), setPixel(), and writePixels()
   // separately.
-  void draw()
-  {
+  public void draw()
+  { 
     if (pixelLocations == null) {
       // No pixels defined yet
       return;
@@ -209,11 +203,11 @@ public class OPC implements Runnable
     int ledAddress = 4;
 
     setPixelCount(numPixels);
-    loadPixels();
+    app.loadPixels();
 
     for (int i = 0; i < numPixels; i++) {
       int pixelLocation = pixelLocations[i];
-      int pixel = (pixelLocation != -1 ? pixels[pixelLocation] : 0);
+      int pixel = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
 
       packetData[ledAddress] = (byte)(pixel >> 16);
       packetData[ledAddress + 1] = (byte)(pixel >> 8);
@@ -221,14 +215,14 @@ public class OPC implements Runnable
       ledAddress += 3;
 
       if (enableShowLocations) {
-        pixels[pixelLocation] = 0xFFFFFF ^ pixel;
+        app.pixels[pixelLocation] = 0xFFFFFF ^ pixel;
       }
     }
 
     writePixels();
 
     if (enableShowLocations) {
-      updatePixels();
+      app.updatePixels();
     }
   }
 
@@ -251,7 +245,7 @@ public class OPC implements Runnable
 
   // Directly manipulate a pixel in the output buffer. This isn't needed
   // for pixels that are mapped to the screen.
-  void setPixel(int number, color c)
+  void setPixel(int number, int c)
   {
     int offset = 4 + number * 3;
     if (packetData == null || packetData.length < offset + 3) {
@@ -265,7 +259,7 @@ public class OPC implements Runnable
 
   // Read a pixel from the output buffer. If the pixel was mapped to the display,
   // this returns the value we captured on the previous frame.
-  color getPixel(int number)
+  int getPixel(int number)
   {
     int offset = 4 + number * 3;
     if (packetData == null || packetData.length < offset + 3) {
@@ -300,7 +294,7 @@ public class OPC implements Runnable
     // Destroy the socket. Called internally when we've disconnected.
     // (Thread continues to run)
     if (output != null) {
-      println("Disconnected from OPC server");
+      System.out.println("Disconnected from OPC server");
     }
     socket = null;
     output = pending = null;
@@ -318,7 +312,7 @@ public class OPC implements Runnable
           socket = new Socket(host, port);
           socket.setTcpNoDelay(true);
           pending = socket.getOutputStream(); // Avoid race condition...
-          println("Connected to OPC server");
+          System.out.println("Connected to OPC server");
           sendColorCorrectionPacket();        // These write to 'pending'
           sendFirmwareConfigPacket();         // rather than 'output' before
           output = pending;                   // rest of code given access.

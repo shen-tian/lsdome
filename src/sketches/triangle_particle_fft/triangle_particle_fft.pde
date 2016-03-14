@@ -5,7 +5,8 @@
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 
-OPC opc;
+FadecandySketch driver = new FadecandySketch(this, 250, 250);
+
 PImage dot;
 PImage colors;
 PImage colors1;
@@ -16,8 +17,6 @@ AudioInput in;
 FFT fft;
 float[] fftFilter;
 
-ArrayList<PVector> points;
-
 //String filename = "083_trippy-ringysnarebeat-3bars.mp3";
 String filename = "/Users/Shen/kafkaf.mp3";
 float spin = 0.001;
@@ -27,9 +26,8 @@ float opacity = 40;
 float minSize = 0.1;
 float sizeScale = 0.2;
 
-void setup()
-{
-  size(250, 250, P2D);
+void setup() {
+  driver.init();
 
   minim = new Minim(this); 
 
@@ -45,24 +43,6 @@ void setup()
   colors3 = loadImage("colors3.png");
   
   colors = colors1;
-
-  setupOpc("192.168.1.135");
-}
-
-void setupOpc(String hostname)
-{
-  opc = new OPC(this, hostname, 7890);
-  int PANEL_LENGTH = 15;
-  points = LayoutUtil.2(0,2,PANEL_LENGTH);
-  ArrayList<PVector> newPoints = new ArrayList<PVector>();
-  for (PVector p : points)
-  {
-    p.add(-.75,-.5,0);
-    p.mult(2.5);
-    newPoints.add(p);
-  }
-    
-  LayoutUtil.registerScreenSamples(opc, newPoints, width, height, 4., true);
 }
 
 void draw()
@@ -70,12 +50,13 @@ void draw()
   background(0);
 
   if (keyPressed) {
-    if (key == '1')
+    if (key == '1') {
       colors = colors1;
-    if (key == '2')
+    } else if (key == '2') {
       colors = colors2;
-    if (key == '3')
+    } else if (key == '3') {
       colors = colors3;
+    }
   }
 
   fft.forward(in.mix);
