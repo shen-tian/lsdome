@@ -220,8 +220,17 @@ public class LayoutUtil {
         double scale = span / (horizSpan ? width : height);
         PVector U = V(1. / scale, 0);
         PVector V = V(0, -1. / scale);
-        PVector offset = V(.5 * width, .5 * height);
+        PVector offset = Vmult(V(width, height), .5);
         return Vadd(basisTransform(p, U, V), offset);
+    }
+
+    // Inverse of xyToScreen
+    static PVector screenToXy(PVector p, int width, int height, double span, boolean horizSpan) {
+        double scale = span / (horizSpan ? width : height);
+        PVector U = V(scale, 0);
+        PVector V = V(0, -scale);
+        PVector offset = Vmult(V(width, height), .5);
+        return basisTransform(Vsub(p, offset), U, V);
     }
 
     // Convert (x, y) coordinate to polar coordinates (radius, theta [counter-clockwise])

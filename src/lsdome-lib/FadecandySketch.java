@@ -63,6 +63,12 @@ public class FadecandySketch {
         app.colorMode(app.HSB, COLOR_STEPS);
     }
 
+    // Convert a screen pixel position to world coordinates.
+    PVector screenToXy(PVector p) {
+        // These parameters must match registerScreenSamples() in init()
+        return LayoutUtil.screenToXy(p, width, height, 2*radius, true);
+    }
+
     // Write a pixel value to the screen buffer.
     // TODO for sketches that only render pixels directly, is there a cost penalty for going
     // through the screen buffer?
