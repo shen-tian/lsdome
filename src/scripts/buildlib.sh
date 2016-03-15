@@ -11,6 +11,6 @@ SRC_DIR=$(cd $(dirname $0)/.. && pwd -P)  # src/ directory of lsdome repo
 
 TEMPDIR=$(mktemp -d)
 javac -target 1.6 -source 1.6 -cp $PROCESSING_DIR/core/library/core.jar -d $TEMPDIR $SRC_DIR/lsdome-lib/*.java
-TEMPFILE=$(mktemp --suffix=.jar)
+TEMPFILE=$(mktemp)
 jar cf $TEMPFILE -C $TEMPDIR .
 echo $TEMPFILE
