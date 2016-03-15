@@ -122,6 +122,7 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     }
 
     int drawDot(PVector p, double t) {
+        boolean track_mouse = true;
         double minRadius = .2;
         double maxRadius = .5;
         double pulsePeriod = 1.5;  //s
@@ -132,7 +133,12 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         double sat = 0.;
 
         double radius = minRadius + (maxRadius - minRadius) * cyclicValue(t, pulsePeriod);
-        PVector center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
+        PVector center;
+        if (track_mouse) {
+            center = normalizePoint(screenToXy(LayoutUtil.V(app.mouseX, app.mouseY)));
+        } else {
+            center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
+        }
         double dist = LayoutUtil.Vsub(p, center).mag();
         double k = (dist > radius ? 0. : cyclicValue(dist, 2*radius));
 
