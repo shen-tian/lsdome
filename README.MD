@@ -17,7 +17,7 @@ ensure that it's in the processing folder.
 
 To build, goto root folder, then
 
-    ./src/scripts/launchsketch.sh ~/processing-2.2.1 `pwd`/src/ pixel_test
+    ./src/scripts/launchsketch.sh ~/processing-2.2.1 pixel_test
     
 This should yield magic.
 
