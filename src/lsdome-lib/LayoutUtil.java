@@ -37,6 +37,11 @@ public class LayoutUtil {
         return PVector.add(a, b);
     }
 
+    // Return a - b
+    static PVector Vsub(PVector a, PVector b) {
+        return Vadd(a, Vmult(b, -1.));
+    }
+
     // Return k * a
     static PVector Vmult(PVector v, double k) {
         return PVector.mult(v, (float)k);

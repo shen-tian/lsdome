@@ -31,14 +31,13 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     }
 
     int samplePoint(PVector p, double t, double t_jitter) {
-        // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
-        p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));
-
         switch (mode) {
         case 0:
             return drawCloud(p, t);
         case 1:
             return drawRing(p, t);
+        case 2:
+            return drawDot(p, t);
         default:
             throw new RuntimeException();
         }
@@ -53,6 +52,9 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
             }
             if (app.key == 'r') {
                 mode = 1;
+            }
+            if (app.key == 'd') {
+                mode = 2;
             }
         }
     }
@@ -70,6 +72,9 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     }
 
     int drawCloud(PVector p, double t) {
+        // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
+        p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));
+
         double z = .08 * t;
         double hue = .1 * t;
         double scale = .75;
@@ -85,6 +90,9 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     }
 
     int drawRing(PVector p, double t) {
+        // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
+        p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));
+
         double z = .08 * t;
         double hue = .1 * t;
         double scale = .75;
@@ -106,6 +114,29 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
                      saturation,
                      constrain(Math.pow(3.0 * n, 1.5), 0, 0.9)
                      );
+    }
+
+    // Return a value from 1 to 0 and back gain as x moves from 0 to 'period'
+    double cyclicValue(double x, double period) {
+        return .5*(Math.cos(x / period * 2*Math.PI) + 1.);
+    }
+
+    int drawDot(PVector p, double t) {
+        double minRadius = .2;
+        double maxRadius = .5;
+        double pulsePeriod = 1.5;  //s
+        double radialPeriod = 20;  //s
+        // Make this relatively prime with radialPeriod to ensure the dot doesn't fall into well-worn tracks.
+        double rotPeriod = 7.3854;  //s
+        double hue = 0.;
+        double sat = 0.;
+
+        double radius = minRadius + (maxRadius - minRadius) * cyclicValue(t, pulsePeriod);
+        PVector center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
+        double dist = LayoutUtil.Vsub(p, center).mag();
+        double k = (dist > radius ? 0. : cyclicValue(dist, 2*radius));
+
+        return color(hue, sat, k);
     }
 
     double fractalNoise(double x, double y, double z) {
