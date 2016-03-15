@@ -21,3 +21,16 @@ To build, goto root folder, then
     
 This should yield magic.
 
+### Simulator
+
+Grab this: 
+
+    git clone https://github.com/zestyping/openpixelcontrol.git
+    make
+    
+Then, grab `13panel-gl_server.json` from `src/config/` and  put it in `openpixelcontrol/layouts`.
+    
+    bin/gl_server -l /13panel-gl_server.json
+    
+to start the simulator. Actually, do this before you do the previous step.
+

@@ -3,7 +3,7 @@
 public interface Config {
 
     // Debug mode.
-    static final boolean DEBUG = true;
+    static final boolean DEBUG = false;
 
     // Fadecandy server.
     static final String FADECANDY_HOST = "127.0.0.1";
