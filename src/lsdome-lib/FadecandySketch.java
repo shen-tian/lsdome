@@ -54,6 +54,9 @@ public class FadecandySketch {
         panel_config_mode = Config.PANEL_LAYOUT;
         LayoutUtil.PanelConfig config = LayoutUtil.getPanelConfig(panel_config_mode);
         points = config.fill(panel_size);
+        
+        LayoutUtil.generateOPCSimLayout(points, app, "layout.json");
+        
         radius = (Config.PARTIAL_LAYOUT ?
                     LayoutUtil.getPanelConfig(Config.FULL_PANEL_LAYOUT) :
                     config
