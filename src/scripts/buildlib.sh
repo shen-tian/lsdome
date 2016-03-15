@@ -1,15 +1,16 @@
 #!/bin/bash
 
-# Recompile shared java code and place the library where processing sketches can access it.
-
+# Usage: buildlib.sh <path of processing install>
+# Recompile shared java code and build a library. Prints the location of the compiled jar to stdout.
 # Example:
-# ./src/scripts/buildlib.sh ~/processing-2.2.1 src/
+# ./src/scripts/buildlib.sh ~/processing-2.2.1
 
 PROCESSING_DIR=$1  # Directory of the processing install (containing core/, java/, lib/, etc.)
-SRC_DIR=$2  # src/ directory of lsdome repo 
+
+SRC_DIR=$(cd $(dirname $0)/.. && pwd -P)  # src/ directory of lsdome repo 
 
 TEMPDIR=$(mktemp -d)
 javac -target 1.6 -source 1.6 -cp $PROCESSING_DIR/core/library/core.jar -d $TEMPDIR $SRC_DIR/lsdome-lib/*.java
-TEMPFILE=$(mktemp)
+TEMPFILE=$(mktemp --suffix=.jar)
 jar cf $TEMPFILE -C $TEMPDIR .
-cp $TEMPFILE $PROCESSING_DIR/lib/lsdomeLib.jar
+echo $TEMPFILE
