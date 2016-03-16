@@ -67,10 +67,22 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
                     String line = input.readLine();
                     System.out.println(line);
                     
+                    int action = 0;
                     if (line.equals("jog_a inc")) {
-                        speed *= 1.01;
+                        action = 1;
                     } else if (line.equals("jog_a dec")) {
-                        speed /= 1.01;
+                        action = -1;
+                    }
+                    if (action == 0) {
+                        continue;
+                    }
+
+                    if (Math.abs(speed) > .02) {
+                        final double SPEED_INC = 1.01;
+                        speed *= (action > 0 == speed > 0 ? SPEED_INC : 1./SPEED_INC);
+                    } else {
+                        final double SPEED_STEP = .001;
+                        speed += (action > 0 ? 1 : -1) * SPEED_STEP;
                     }
                     System.out.println(""+speed);
                 }
