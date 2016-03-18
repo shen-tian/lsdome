@@ -205,9 +205,34 @@ public class OPC implements Runnable
     setPixelCount(numPixels);
     app.loadPixels();
 
+    float[] sats = new float[numPixels];
+    float[] lums = new float[numPixels];
     for (int i = 0; i < numPixels; i++) {
       int pixelLocation = pixelLocations[i];
       int pixel = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
+
+      sats[i] = app.saturation(pixel);
+      lums[i] = app.brightness(pixel);
+    }
+    Arrays.sort(sats);
+    Arrays.sort(lums);
+
+    float pctile = .05f;
+    float lowsat = sats[(int)(pctile * numPixels)];
+    float lowlum = lums[(int)(pctile * numPixels)];
+    float highsat = sats[(int)((1-pctile) * numPixels)];
+    float highlum = lums[(int)((1-pctile) * numPixels)];
+    
+    for (int i = 0; i < numPixels; i++) {
+      int pixelLocation = pixelLocations[i];
+      int pixel = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
+
+      float h = app.hue(pixel);
+      float s = app.saturation(pixel);
+      float b = app.brightness(pixel);
+      //s = 100f * (s - lowsat) / (highsat - lowsat);
+      b = 100f * (b - lowlum) / (highlum - lowlum);
+      pixel = app.color(h, s, b);
 
       packetData[ledAddress] = (byte)(pixel >> 16);
       packetData[ledAddress + 1] = (byte)(pixel >> 8);
