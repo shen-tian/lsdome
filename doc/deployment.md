@@ -7,15 +7,35 @@ There's two components to this:
 
 Note that `fcserver` is unaware of audio, the animation software should look after its own audio requirements. 
 
-## Setting up `fcserver`
+## Setting up `fcserver` on a Raspberry Pi
 
-Mainly followed this [tutorial](https://learn.adafruit.com/1500-neopixel-led-curtain-with-raspberry-pi-fadecandy/fadecandy-server-setup).
+Testing was done with a Pi 2. No idea how this works on other versions. Mainly followed this [tutorial](https://learn.adafruit.com/1500-neopixel-led-curtain-with-raspberry-pi-fadecandy/fadecandy-server-setup) from Adafruit, but in essence:
 
-Config file is `/usr/local/bin/fcserver.json`.
+SSH in, and in homefolder:
 
-Note that brightness limit is set using the whitepoint setting. Can this be updated on the fly?
+    sudo apt-get -y install git
+    git clone git://github.com/scanlime/fadecandy
+    cd fadecandy/server
+    make submodules
+    make
+    
+    sudo mv fcserver /usr/local/bin
+    
+Then, to auto start
 
-## Alternative :: Running `fcserver` on TL-MR3040
+    sudo nano /etc/rc.local
+    
+Just above the final “exit 0” line, copy and paste the following:
+
+    /usr/local/bin/fcserver /usr/local/bin/fcserver.json &gt;/var/log/fcserver.log 2&gt;&amp;1 &amp;
+    
+Then, make the config file:
+
+    sudo nano /usr/local/bin/fcserver.json
+    
+Use the files in `/src/config` as templates, depending on the actual panel configuration.
+
+## Alternative: running `fcserver` on TL-MR3040
 
 The TP-Link MR3040 is a neat little device. It's a battery powered WiFi AP/Router, with one USB 2.0 port, one BASE100 ethernet port, and a 1x1 radio. Compared to a Pi, this has:
 
@@ -41,23 +61,23 @@ Export the sketch, targeting Linux (don't need to worry about arch)
 
 We are working with Processing 2.x (most likely 2.2), apparently, Java 7 works best. Install it by
 
-```
-sudo apt-get install oracle-java7-jdk
-```
+
+    sudo apt-get install oracle-java7-jdk
+
 and ensure it's the default Java by running:
 
-```
-sudo update-alternatives --config java
-```
+
+    sudo update-alternatives --config java
+
 
 Now try to run the sketch (once you are in X) by typing `sh /path/yoursketch`. If you get something about can't use pixels on this device, it might be [this issue](https://github.com/processing/processing/issues/2010.html).
 
 The fix is to force 32 bit mode. Adding this to the bottom of `\boot\config.txt` seems to work:
 
-```
-framebuffer_depth=32
-framebuffer_ignore_alpha=1
-```
+
+    framebuffer_depth=32
+    framebuffer_ignore_alpha=1
+
 
 ### Automatically launch into X, then the sketch
 
@@ -67,13 +87,13 @@ Add a .desktop file to the startup folder (`/etc/xdg/autostart`)
 
 format is something like this:
 
-```
-[Desktop Entry]
-Name=Cloud Autostart
-Exec=sh /path/yoursketch
-Type=Application
-Terminal=true
-```
+
+    [Desktop Entry]
+    Name=Cloud Autostart
+    Exec=sh /path/yoursketch
+    Type=Application
+    Terminal=true
+
 
 This also seem to run without screensaver/power saving issues. Not sure if its anything in the config, or just what a Pi with Raspbian does.
 
@@ -82,5 +102,3 @@ This also seem to run without screensaver/power saving issues. Not sure if its a
 Tried adding `@/bin/sh /path/yoursketch` to end of `/etc/xdg/lxsession/LXDE/autostart` but it didn't work.
 
 Maybe it should be added to `LXDE-pi/autostart`? 
-
-
