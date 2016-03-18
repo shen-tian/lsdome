@@ -10,8 +10,7 @@ import java.util.*;
 import processing.core.*;
 
 // IR is the type of the intermediate representation of the individual points to be sampled/rendered.
-// S is the type of the state that is maintained and updated each frame.
-public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
+public abstract class PointSampleSketch<IR, S> extends FadecandySketch<S> {
 
     static final int DEFAULT_BASE_SUBSAMPLING = 1;
     static final int MAX_SUBSAMPLING = 64;
@@ -19,12 +18,6 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
     // Mapping of display pixels to 1 or more actual samples that will be combined to yield that
     // display pixel's color.
     ArrayList<ArrayList<IR>> points_ir;
-
-    // Ongoing state to be updated each frame (such as positions, directions, etc.).
-    S state;
-
-    // Timestamp of the most recent completed frame.
-    double last_t;
 
     // Amount of subsampling for each display pixel.
     int base_subsampling;
@@ -72,8 +65,6 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
             total_subsamples += num_subsamples;
         }
 
-        state = initialState();
-
         System.out.println(String.format("%d subsamples for %d pixels (%.1f samples/pixel)",
                                          total_subsamples, points.size(), (double)total_subsamples / points.size()));
     }
@@ -100,47 +91,14 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch {
         return (IR)p;
     }
 
-    // **OVERRIDE** (optional)
-    // Return the initial persistent state.
-    S initialState() {
-        return null;
-    }
-
-    // **OVERRIDE** (optional)
-    // Update the persistent state from one frame to the next. t_delta is the time elapsed since the
-    // previous frame.
-    S updateState(S state, double t_delta) {
-        return state;
-    }
-
     void draw(double t) {
-        _updateState(t);
-        beforeFrame(t);
-
         app.background(0);
         app.loadPixels();
         for (int i = 0; i < points.size(); i++) {
             app.pixels[opc.pixelLocations[i]] = sampleAntialiased(points_ir.get(i), t);
         }
         app.updatePixels();
-
-        afterFrame(t);
     }
-
-    void _updateState(double t) {
-        if (last_t > 0) {
-            state = updateState(state, t - last_t);
-        }
-        last_t = t;
-    }
-
-    // **OVERRIDE** (optional)
-    // A hook to be called before the frame is rendered.
-    void beforeFrame(double t) { }
-
-    // **OVERRIDE** (optional)
-    // A hook to be called after the frame is rendered.
-    void afterFrame(double t) { }
 
     // Perform the anti-aliasing for a single display pixel.
     int sampleAntialiased(ArrayList<IR> sub, double t) {
