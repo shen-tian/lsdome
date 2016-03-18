@@ -9,7 +9,7 @@ Note that `fcserver` is unaware of audio, the animation software should look aft
 
 ## Setting up `fcserver`
 
-Mainly followed this https://learn.adafruit.com/1500-neopixel-led-curtain-with-raspberry-pi-fadecandy/fadecandy-server-setup .
+Mainly followed this [tutorial](https://learn.adafruit.com/1500-neopixel-led-curtain-with-raspberry-pi-fadecandy/fadecandy-server-setup).
 
 Config file is `/usr/local/bin/fcserver.json`.
 
@@ -25,7 +25,7 @@ The TP-Link MR3040 is a neat little device. It's a battery powered WiFi AP/Route
 * Comes in a case;
 * Only one USB 2.0 port, so we need a hub.
 
-In place of Raspbian for the Pis, we can use OpenWRT on it. Some one ported `fcserver` to run on it [here][https://github.com/nemik/fadecandy-openwrt] with [instructions here][http://blog.nemik.net/2014/02/standalone-openwrt-fadecandy-server-for-led-control/]
+In place of Raspbian for the Pis, we can use OpenWRT on it. Some one ported `fcserver` to run on it [here](https://github.com/nemik/fadecandy-openwrt) with [instructions here](http://blog.nemik.net/2014/02/standalone-openwrt-fadecandy-server-for-led-control/).
 
 Need to check the performance, but suspect it should be OK.
 
@@ -50,7 +50,7 @@ and ensure it's the default Java by running:
 sudo update-alternatives --config java
 ```
 
-Now try to run the sketch (once you are in X) by typing `sh /path/yoursketch`. If you get something about can't use pixels on this device, it might be this issue: https://github.com/processing/processing/issues/2010.html
+Now try to run the sketch (once you are in X) by typing `sh /path/yoursketch`. If you get something about can't use pixels on this device, it might be [this issue](https://github.com/processing/processing/issues/2010.html).
 
 The fix is to force 32 bit mode. Adding this to the bottom of `\boot\config.txt` seems to work:
 
