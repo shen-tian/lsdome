@@ -9,7 +9,6 @@
 import java.io.*;
 import java.net.*;
 import java.util.*;
-import java.util.Arrays;
 import processing.core.*;
 
 public class OPC implements Runnable
@@ -22,10 +21,12 @@ public class OPC implements Runnable
   int port;
 
   int[] pixelLocations;
+  int[] pixelBuffer;
   byte[] packetData;
   byte firmwareConfig;
   String colorCorrection;
   boolean enableShowLocations;
+  FramePostprocessor framePostprocessor;
 
   OPC(PApplet parent, String host, int port)
   {
@@ -41,6 +42,7 @@ public class OPC implements Runnable
   // Mark the screen xy coordinates in 'points' as pixels 0..(n-1)
   void registerLEDs(ArrayList<PVector> points) {
       pixelLocations = new int[points.size()];
+      pixelBuffer = new int[pixelLocations.length];
       for (int i = 0; i < pixelLocations.length; i++) {
           PVector p = points.get(i);
           if (p == null) {
@@ -48,8 +50,8 @@ public class OPC implements Runnable
               continue;
           }
 
-          int x = (int)p.x;
-          int y = (int)p.y;
+          int x = (int)Math.floor(p.x);
+          int y = (int)Math.floor(p.y);
           if (x >= 0 && x < app.width && y >= 0 && y < app.height) {
               pixelLocations[i] = x + app.width * y;
           } else {
@@ -184,6 +186,13 @@ public class OPC implements Runnable
     }
   }
 
+  // An option to modify an entire frame's worth of pixels before they're sent to the hardware,
+  // such as to perform color balancing / contrast equilization, etc.
+  public static interface FramePostprocessor {
+    // FIXME this will include out-of-frame pixels set to black
+    void postProcessFrame(int[] pixelBuffer);
+  }
+
   // Automatically called at the end of each draw().
   // This handles the automatic Pixel to LED mapping.
   // If you aren't using that mapping, this function has no effect.
@@ -205,34 +214,15 @@ public class OPC implements Runnable
     setPixelCount(numPixels);
     app.loadPixels();
 
-    float[] sats = new float[numPixels];
-    float[] lums = new float[numPixels];
     for (int i = 0; i < numPixels; i++) {
       int pixelLocation = pixelLocations[i];
-      int pixel = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
-
-      sats[i] = app.saturation(pixel);
-      lums[i] = app.brightness(pixel);
+      pixelBuffer[i] = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
     }
-    Arrays.sort(sats);
-    Arrays.sort(lums);
-
-    float pctile = .05f;
-    float lowsat = sats[(int)(pctile * numPixels)];
-    float lowlum = lums[(int)(pctile * numPixels)];
-    float highsat = sats[(int)((1-pctile) * numPixels)];
-    float highlum = lums[(int)((1-pctile) * numPixels)];
-    
+    if (framePostprocessor != null) {
+      framePostprocessor.postProcessFrame(pixelBuffer);
+    }
     for (int i = 0; i < numPixels; i++) {
-      int pixelLocation = pixelLocations[i];
-      int pixel = (pixelLocation != -1 ? app.pixels[pixelLocation] : 0);
-
-      float h = app.hue(pixel);
-      float s = app.saturation(pixel);
-      float b = app.brightness(pixel);
-      //s = 100f * (s - lowsat) / (highsat - lowsat);
-      b = 100f * (b - lowlum) / (highlum - lowlum);
-      pixel = app.color(h, s, b);
+      int pixel = pixelBuffer[i];
 
       packetData[ledAddress] = (byte)(pixel >> 16);
       packetData[ledAddress + 1] = (byte)(pixel >> 8);
@@ -240,6 +230,8 @@ public class OPC implements Runnable
       ledAddress += 3;
 
       if (enableShowLocations) {
+        // FIXME this doesn't seem to work?
+        int pixelLocation = pixelLocations[i];
         app.pixels[pixelLocation] = 0xFFFFFF ^ pixel;
       }
     }
