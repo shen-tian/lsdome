@@ -61,10 +61,13 @@ public class LayoutUtil {
         return Vadd(Vmult(U, p.x), Vmult(V, p.y));
     }
 
-    // Spacing between points of a triangular grid of size 'n' where distance between points is twice the
-    // distance from an edge point to the edge of the containing triangle.
+    // Spacing between points of a triangular grid of size 'n' where distance between edge points on opposing
+    // panels is 'k' times the distance between adjacent points on the same panel.
     static double pixelSpacing(int n) {
-        return 1. / (n - 1 + SQRT_3);
+        // Even spacing across the panel gap. .5*SQRT_3 may be a better choice as it makes the density more
+        // consistent across the gap (the gaps jump out less), but makes a bunch of other logic more complicated.
+        double k = 1.;
+        return 1. / (n - 1 + k * SQRT_3);
     }
     
     static interface Transform {
@@ -89,12 +92,27 @@ public class LayoutUtil {
         };
     }
 
+    static ArrayList<TriCoord> fillTriangle(int n) {
+        ArrayList<TriCoord> coords = new ArrayList<TriCoord>();
+        for (int row = 0; row < n; row++) {
+            boolean reversed = (row % 2 == 1);
+            int width = n - row;
+            for (int col = 0; col < width; col++) {
+                int c = (reversed ? width - 1 - col : col);
+                TriCoord tc = TriCoord.fromParts(CoordType.PIXEL, Axis.U, row, Axis.V, c, PanelOrientation.A, n);
+                coords.add(tc);
+            }
+        }
+        return coords;
+    }
+
     // Evenly fill a triangle with a grid of points of size n. The triangle filled is an equilateral triangle
     // with points at (0, 0), (1, 0), and (.5, sqrt(3)/2). Points are placed such that spacing between two
     // adjacent points will match the spacing between an edge point and the opposing point of a neighboring
     // triangle. Returns a list of points traversed in a boustrophedon manner, starting near the origin,
     // proceeding left/right, then upward. The point near (0, 0) will thus be known as the 'entry' point, and
     // the top-most point as the 'exit' point.
+    /*
     static ArrayList<PVector> fillTriangle(int n) {
         double spacing = pixelSpacing(n);
         ArrayList<PVector> points = new ArrayList<PVector>();
@@ -109,9 +127,28 @@ public class LayoutUtil {
         }
         return points;
     }
+    */
+
+    static ArrayList<DomeCoord> fillTriangle(final PVector entry, final int rot, int n) {
+        // TODO reuseable?
+        int[][] offsets = {{0, 0, -1}, {-1, 0, -1}, {-1, 0, 0}, {-1, -1, 0}, {0, -1, 0}, {0, -1, -1}};
+
+        int u0 = (int)entry.x;
+        int v0 = (int)entry.y;
+        int[] o = offsets[MathUtil.mod(rot, 6)];
+        TriCoord panel = TriCoord.fromParts(CoordType.PANEL, Axis.U, u0 + o[0], Axis.V, v0 + o[1],
+                                            MathUtil.mod(rot, 2) == 0 ? PanelOrientation.A : PanelOrientation.B, 0);
+
+        ArrayList<DomeCoord> coords = new ArrayList<DomeCoord>(); 
+        for (TriCoord c : fillTriangle(n)) {
+            coords.add(new DomeCoord(panel, c.rotate(rot)));
+        }
+        return coords;
+    }
     
     // Fill a triangle using the sizing and entry/exit semantics from above, where the triangle's origin is
     // the axial UV coordinate 'entry' and rotated clockwise by angle 60deg * rot
+    /*
     static ArrayList<PVector> fillTriangle(final PVector entry, final int rot, int n) {
         return transform(fillTriangle(n), new Transform() {
                 public PVector transform(PVector p) {
@@ -119,16 +156,33 @@ public class LayoutUtil {
                 }
             });
     }
+    */
     
     // Get the exit point for a triangle fill
     static PVector exitPointForFill(PVector entry, int rot) {
         return axialNeighbor(entry, rot - 1);
+    }
+
+    static ArrayList<DomeCoord> fillFan(int orientation, int segments, int pixels) {
+        return fillFan(orientation, segments, pixels, V(0, 0));
+    }
+
+    static ArrayList<DomeCoord> fillFan(int orientation, int segments, int pixels, PVector entry) {
+        ArrayList<DomeCoord> points = new ArrayList<DomeCoord>();
+        int rot = orientation;
+        for (int i = 0; i < segments; i++) {
+            points.addAll(fillTriangle(entry, rot, pixels));
+            entry = exitPointForFill(entry, rot);
+            rot += 1;
+        }
+        return points;
     }
     
     // Fill a fan of triangles proceeding in a clockwise fashion until a complete hexagon whose perimeter
     // intersects the origin is filled. 'segments' is the number of triangular segments to fill (up to 6).
     // 'pixels' is the fill density within each triangle. 'orientation' is the initial orientation in
     // which the long axis of the hexagon follows the angle specified by 'rot' semantics above.
+    /*
     static ArrayList<PVector> fillFan(int orientation, int segments, int pixels) {
         ArrayList<PVector> points = new ArrayList<PVector>();
         PVector entry = V(0., 0.);
@@ -137,6 +191,28 @@ public class LayoutUtil {
             points.addAll(fillTriangle(entry, rot, pixels));
             entry = exitPointForFill(entry, rot);
             rot += 1;
+        }
+        return points;
+    }
+    */
+
+    static PVector coordToXy(DomeCoord c) {
+        double spacing = pixelSpacing(c.pixel.panel_length);
+        PVector root = c.panel.toV();
+        PVector px = c.pixel.toV();
+        PVector offset = V(1/SQRT_3, 1/SQRT_3);
+        if (c.panel.getOrientation() == PanelOrientation.B) {
+            root = Vadd(root, V(1, 1));
+            px = Vsub(px, V(c.pixel.panel_length - 1, c.pixel.panel_length - 1));
+            offset = Vmult(offset, -1);
+        }
+        return axialToXy(Vadd(root, Vmult(Vadd(px, offset), spacing)));
+    }
+
+    static ArrayList<PVector> coordsToXy(ArrayList<DomeCoord> coords) {
+        ArrayList<PVector> points = new ArrayList<PVector>();
+        for (DomeCoord c : coords) {
+            points.add(coordToXy(c));
         }
         return points;
     }
@@ -166,7 +242,7 @@ public class LayoutUtil {
                                             2./3.*SQRT_3,
                                             new int[] {2}) {
             ArrayList<PVector> fill(int n) {
-                return transform(fillFan(0, 2, n), translate(axialToXy(V(-1/3., -1/3.))));
+                return transform(coordsToXy(fillFan(0, 2, n)), translate(axialToXy(V(-1/3., -1/3.))));
             }
         };
     static PanelConfig _13 = new PanelConfig(13,
@@ -176,9 +252,9 @@ public class LayoutUtil {
                 final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
                 ArrayList<PVector> points = new ArrayList<PVector>();
                 for (int i = 0; i < 3; i++) {
-                    points.addAll(transform(fillFan(2*i+1, 4, n), translate(axialToXy(entries[i]))));
+                    points.addAll(coordsToXy(fillFan(2*i+1, 4, n, entries[i])));
                 }
-                points.addAll(fillTriangle(V(0, 0), 0, n));
+                points.addAll(coordsToXy(fillTriangle(V(0, 0), 0, n)));
                 return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
             }
         };
@@ -188,7 +264,7 @@ public class LayoutUtil {
             ArrayList<PVector> fill(int n) {
                 ArrayList<PVector> points = new ArrayList<PVector>();
                 for (int i = 0; i < 6; i++) {
-                    points.addAll(fillFan(i, 4, n));
+                    points.addAll(coordsToXy(fillFan(i, 4, n)));
                 }
                 return points;
             }

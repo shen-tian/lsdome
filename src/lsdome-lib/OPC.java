@@ -41,6 +41,7 @@ public class OPC implements Runnable
 
   // Mark the screen xy coordinates in 'points' as pixels 0..(n-1)
   void registerLEDs(ArrayList<PVector> points) {
+      // TODO map a dome pixel to several screen pixels to support subsampling?
       pixelLocations = new int[points.size()];
       pixelBuffer = new int[pixelLocations.length];
       for (int i = 0; i < pixelLocations.length; i++) {

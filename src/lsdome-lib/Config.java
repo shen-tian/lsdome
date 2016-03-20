@@ -21,4 +21,5 @@ public interface Config {
     static final boolean PARTIAL_LAYOUT = false;
     // The larger layout. Ignored if PARTIAL_LAYOUT is false.
     static final PanelLayout FULL_PANEL_LAYOUT = PanelLayout._24;
+
 }
