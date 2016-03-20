@@ -1,3 +1,7 @@
+// Template for sketches where you want to directly assign a color to each pixel in the dome grid.
+// The color assigned may depend on its triangular grid position or its xy position-- all that matters
+// is that there is no underlying 'screen' being rendered that you want to pluck colors from.
+
 import java.util.*;
 import processing.core.*;
 

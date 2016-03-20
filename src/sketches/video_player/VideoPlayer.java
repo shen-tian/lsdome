@@ -2,6 +2,10 @@ import processing.core.*;
 import processing.video.*;
 import java.util.Arrays;
 
+// Play video from file. Will size the projection area to the smallest bounding rectangle for the pixels.
+// Aspect ratio is not preserved (support for such is a TODO). Dynamic contrast stretch is supported.
+
+// Keyboard controls:
 // p: play/plause
 // .: ff 5 sec
 // ,: rewind 5 sec

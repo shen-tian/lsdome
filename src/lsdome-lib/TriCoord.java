@@ -1,6 +1,43 @@
 import java.util.*;
 import processing.core.*;
 
+// Representation of a lattice (integer) coordinate within a 3-axis triangular coordinate system.
+// Unlike a two-axis x/y coordinate system, a triangular lattice has points along 3 axes. It is
+// still 2-dimensional, as moving along one axis has effects on the other two.
+//
+// We call the 3 axes U, V, and W. The value for U increases in the vertical direction. Values for V
+// and W increase in the directions rotated clockwise from U 120 and 240 degrees, respectively.
+//
+// The values for u, v, and w will always sum to the same amount. What this amount is varies
+// depending on the context in which the coordinates are used. Also, things are slightly more
+// complicated for us in that the dome uses two differently oriented triangular grids due to the
+// tesselation of the panels, so the magic number will be one of two values, and the sum tells us
+// the grid orientation.
+//
+// In theory u, v, and w can be real-valued, but for our purposes we truncate them to ints.
+// Specifically, we take the floor of the value. That means there is no pixel (0, 0, 0), because
+// positive increase in the W direction is on the opposite side of the origin from u=0 v=0. Thus
+// that first pixel is actually (0, 0, -1).
+//
+// We use these coordinates in 3 different contexts:
+//
+// UNIVERSAL
+// An abstract plane where all pixels comprise a continuous, infinite grid. This still works despite
+// our oscillating grid orientation, as the third axis provides enough information to disambiguate.
+// (With a pure triangular grid, you could always derive the 3rd axis from the first two). Axes sum
+// to -1 for upright orientation, and -2 when flipped.
+//
+// PANEL
+// Essential similar to universal, but referring to actual panels in the grid rather than pixels.
+// For panels of size 1, the systems are equivalent.
+//
+// PIXEL
+// For tracking pixels within a single panel. Each axes will be valued [0, panel size). In normal
+// orientation, axes align with the panel edges; all axes sum to <panel size> - 1. In flipped
+// orientation, axes graze the corners; they will sum to 2*(<panel size> - 1).
+//
+// Coordinates can be converted to xy cartesian coordinates in LayoutUtil.
+
 enum CoordType {
     UNIVERSAL,
     PANEL,
@@ -53,6 +90,7 @@ public class TriCoord {
         assert sum == checksum(PanelOrientation.A) || sum == checksum(PanelOrientation.B);
     }
 
+    // Build a coordinate from just two of the axes and the orientation.
     static TriCoord fromParts(CoordType type, Axis axis1, int val1, Axis axis2, int val2, PanelOrientation o, int panel_length) {
         assert axis1 != axis2;
 
@@ -72,6 +110,7 @@ public class TriCoord {
         return new TriCoord(type, vals[0], vals[1], vals[2], panel_length);
     }
 
+    // Expected sum of the values u, v, w.
     static int checksum(PanelOrientation o, int panel_length) {
         if (o == PanelOrientation.A) {
             return panel_length - 1;
@@ -86,6 +125,7 @@ public class TriCoord {
         return checksum(o, panel_length);
     }
 
+    // Derive the orientation from the coordinate.
     PanelOrientation getOrientation() {
         int sum = u + v + w;
         if (sum == checksum(PanelOrientation.A)) {
@@ -97,6 +137,7 @@ public class TriCoord {
         }
     }
 
+    // Rotate the coordinate clockwise by rot * 60 degrees.
     TriCoord rotate(int rot) {
         boolean invert = (MathUtil.mod(rot, 2) == 1);
         if (invert) {

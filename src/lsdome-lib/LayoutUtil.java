@@ -91,7 +91,11 @@ public class LayoutUtil {
             }
         };
     }
-
+ 
+    // Evenly fill a triangle with a grid of points of size n. The triangle filled is an equilateral triangle
+    // with points at (0, 0), (1, 0), and (.5, sqrt(3)/2). Returns a list of points traversed in a boustrophedon
+    // manner, starting near the origin, proceeding left/right, then upward. The point near (0, 0) will thus be
+    // known as the 'entry' point, and the top-most point as the 'exit' point.
     static ArrayList<TriCoord> fillTriangle(int n) {
         ArrayList<TriCoord> coords = new ArrayList<TriCoord>();
         for (int row = 0; row < n; row++) {
@@ -106,31 +110,10 @@ public class LayoutUtil {
         return coords;
     }
 
-    // Evenly fill a triangle with a grid of points of size n. The triangle filled is an equilateral triangle
-    // with points at (0, 0), (1, 0), and (.5, sqrt(3)/2). Points are placed such that spacing between two
-    // adjacent points will match the spacing between an edge point and the opposing point of a neighboring
-    // triangle. Returns a list of points traversed in a boustrophedon manner, starting near the origin,
-    // proceeding left/right, then upward. The point near (0, 0) will thus be known as the 'entry' point, and
-    // the top-most point as the 'exit' point.
-    /*
-    static ArrayList<PVector> fillTriangle(int n) {
-        double spacing = pixelSpacing(n);
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        for (int row = 0; row < n; row++) {
-            boolean reversed = (row % 2 == 1);
-            int width = n - row;
-            for (int col = 0; col < width; col++) {
-                int c = (reversed ? width - 1 - col : col);
-                PVector p = axialToXy(Vmult(V(row + 1/SQRT_3, c + 1/SQRT_3), spacing));
-                points.add(p);
-            }
-        }
-        return points;
-    }
-    */
-
+    // Fill a triangle using the sizing and entry/exit semantics from above, where the triangle's origin is
+    // the axial UV coordinate 'entry' and rotated clockwise by angle 60deg * rot
     static ArrayList<DomeCoord> fillTriangle(final PVector entry, final int rot, int n) {
-        // TODO reuseable/deriveable?
+        // TODO can these be derived from first principles?
         int[][] offsets = {{0, 0, -1}, {-1, 0, -1}, {-1, 0, 0}, {-1, -1, 0}, {0, -1, 0}, {0, -1, -1}};
 
         int u0 = (int)entry.x;
@@ -146,18 +129,6 @@ public class LayoutUtil {
         return coords;
     }
     
-    // Fill a triangle using the sizing and entry/exit semantics from above, where the triangle's origin is
-    // the axial UV coordinate 'entry' and rotated clockwise by angle 60deg * rot
-    /*
-    static ArrayList<PVector> fillTriangle(final PVector entry, final int rot, int n) {
-        return transform(fillTriangle(n), new Transform() {
-                public PVector transform(PVector p) {
-                    return Vadd(Vrot(p, -rot * PI / 3.), axialToXy(entry));
-                }
-            });
-    }
-    */
-    
     // Get the exit point for a triangle fill
     static PVector exitPointForFill(PVector entry, int rot) {
         return axialNeighbor(entry, rot - 1);
@@ -167,6 +138,10 @@ public class LayoutUtil {
         return fillFan(orientation, segments, pixels, V(0, 0));
     }
 
+    // Fill a fan of triangles proceeding in a clockwise fashion until a complete hexagon whose perimeter
+    // intersects the origin is filled. 'segments' is the number of triangular segments to fill (up to 6).
+    // 'pixels' is the fill density within each triangle. 'orientation' is the initial orientation in
+    // which the long axis of the hexagon follows the angle specified by 'rot' semantics above.
     static ArrayList<DomeCoord> fillFan(int orientation, int segments, int pixels, PVector entry) {
         ArrayList<DomeCoord> points = new ArrayList<DomeCoord>();
         int rot = orientation;
@@ -178,24 +153,9 @@ public class LayoutUtil {
         return points;
     }
     
-    // Fill a fan of triangles proceeding in a clockwise fashion until a complete hexagon whose perimeter
-    // intersects the origin is filled. 'segments' is the number of triangular segments to fill (up to 6).
-    // 'pixels' is the fill density within each triangle. 'orientation' is the initial orientation in
-    // which the long axis of the hexagon follows the angle specified by 'rot' semantics above.
-    /*
-    static ArrayList<PVector> fillFan(int orientation, int segments, int pixels) {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        PVector entry = V(0., 0.);
-        int rot = orientation;
-        for (int i = 0; i < segments; i++) {
-            points.addAll(fillTriangle(entry, rot, pixels));
-            entry = exitPointForFill(entry, rot);
-            rot += 1;
-        }
-        return points;
-    }
-    */
-
+    // Convert tri-grid u/v/w coordinates to cartesian x/y coordinates. Points are placed such that spacing
+    // between two adjacent points will match the spacing between an edge point and the opposing point of a
+    // neighboring triangle.
     static PVector coordToXy(DomeCoord c) {
         double spacing = pixelSpacing(c.pixel.panel_length);
         PVector root = c.panel.toV();
@@ -209,20 +169,12 @@ public class LayoutUtil {
         return axialToXy(Vadd(root, Vmult(Vadd(px, offset), spacing)));
     }
 
-    static ArrayList<PVector> coordsToXy(ArrayList<DomeCoord> coords) {
-        ArrayList<PVector> points = new ArrayList<PVector>();
-        for (DomeCoord c : coords) {
-            points.add(coordToXy(c));
-        }
-        return points;
-    }
-
     // All metadata associated with a particular layout of panels.
     static abstract class PanelConfig {
         double radius;  // Max radius of panel configuration, in panel lengths
         int[] arms;     // Number of panels per fadecandy 'arm'
-        PVector origin;
-        double theta;
+        PVector origin; // Center the layout on this point (in UV coordinates)
+        double theta;   // Rotate the layout counter-clockwise by this many degrees
 
         public PanelConfig(int num_panels, double radius, int[] arms, PVector origin, double theta) {
             this.radius = radius;
@@ -240,6 +192,7 @@ public class LayoutUtil {
         // Fill the lsdome configuration with pixels
         abstract ArrayList<DomeCoord> fill(int n);
 
+        // Convert the filled grid points to a mapping of grid points to their actual positions.
         HashMap<DomeCoord, PVector> coordsToXy(ArrayList<DomeCoord> coords) {
             HashMap<DomeCoord, PVector> coordToPoint = new HashMap<DomeCoord, PVector>();
             PVector offset = axialToXy(origin);

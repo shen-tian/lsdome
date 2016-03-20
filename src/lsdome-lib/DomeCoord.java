@@ -1,9 +1,16 @@
 import java.util.*;
 
+// Representation of a coordinate within the dome pixel grid. See TriCoord.java for more info.
+
 public class DomeCoord {
 
+    // Every pixel in the dome has a unique coordinate.
     TriCoord universal;
+
+    // Universal coordinate split into a panel component...
     TriCoord panel;
+
+    // and a within-panel pixel component.
     TriCoord pixel;
 
     public DomeCoord(TriCoord uni, int panel_length) {
