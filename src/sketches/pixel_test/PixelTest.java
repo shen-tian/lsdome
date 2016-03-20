@@ -1,6 +1,6 @@
 import processing.core.*;
 
-public class PixelTest extends FadecandySketch {
+public class PixelTest extends FadecandySketch<Object> {
 
     public PixelTest(PApplet app, int size_px) {
         super(app, size_px);

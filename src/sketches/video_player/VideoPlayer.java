@@ -2,21 +2,18 @@ import processing.core.*;
 import processing.video.*;
 import java.util.Arrays;
 
-// crop viewing area to extents of pixel grid
-// option to preserve aspect ratio (with crop or shrink)
-// contrast stretch
-
 // p: play/plause
 // .: ff 5 sec
 // ,: rewind 5 sec
 
 enum VideoSizing {
     STRETCH_TO_FIT,
-    PRESERVE_ASPECT_GROW,
-    PRESERVE_ASPECT_SHRINK
+    // TODO support preserving aspect ratio
+    //PRESERVE_ASPECT_GROW,
+    //PRESERVE_ASPECT_SHRINK
 }
 
-public class VideoPlayer extends FadecandySketch implements OPC.FramePostprocessor {
+public class VideoPlayer extends FadecandySketch<Object> implements OPC.FramePostprocessor {
 
     static final double[] skips = {5};
 
@@ -24,6 +21,13 @@ public class VideoPlayer extends FadecandySketch implements OPC.FramePostprocess
     boolean playing;
     VideoSizing sizeMode;
     boolean contrastStretch;
+
+    // 'projection' rectangle to get more of the video area to overlap the panels
+    double px0;
+    double pw;
+    double py0;
+    double ph;
+    boolean sizeModeInitialized = false;
 
     public VideoPlayer(PApplet app, int size_px, String filename) {
         this(app, size_px, filename, VideoSizing.STRETCH_TO_FIT, false);
@@ -44,10 +48,51 @@ public class VideoPlayer extends FadecandySketch implements OPC.FramePostprocess
         playing = true;
         System.out.println("duration: " + mov.duration());
         // TODO some event when playback has finished?
+
+        setProjectionArea();
+    }
+
+    void setProjectionArea() {
+        double xmin = radius;
+        double xmax = -radius;
+        double ymin = radius;
+        double ymax = -radius;
+        for (PVector p : points) {
+            xmin = Math.min(xmin, p.x);
+            xmax = Math.max(xmax, p.x);
+            ymin = Math.min(ymin, p.y);
+            ymax = Math.max(ymax, p.y);
+        }
+        double margin = .5*LayoutUtil.pixelSpacing(panel_size);
+        xmin -= margin;
+        xmax += margin;
+        ymin -= margin;
+        ymax += margin;
+
+        PVector p0 = xyToScreen(LayoutUtil.V(xmin, ymax));
+        PVector pdiag = LayoutUtil.Vsub(xyToScreen(LayoutUtil.V(xmax, ymin)), p0);
+        px0 = p0.x;
+        py0 = p0.y;
+        pw = pdiag.x;
+        ph = pdiag.y;
+    }
+
+    void initializeViewport() {
+        // If we want to do stuff with aspect ratio we'd do it here.
+        System.out.println("viewport aspect ratio: " + (pw/ph));
+        System.out.println("original video aspect ratio: " + ((double)mov.width/mov.height));
+
+        sizeModeInitialized = true;
     }
 
     void draw(double t) {
-        app.image(mov, 0, 0, width, height);
+        if (!sizeModeInitialized) {
+            // Video dimensions aren't available until we actually draw a frame.
+            app.image(mov, 0, 0, width, height);
+            app.background(0);
+            initializeViewport();
+        }
+        app.image(mov, (float)px0, (float)py0, (float)pw, (float)ph);
     }
 
     void keyPressed() {
