@@ -33,8 +33,13 @@ public class FadecandySketch<S> {
     // Reference to fadecandy controller
     OPC opc;
 
-    // Locations of pixels
-    ArrayList<PVector> points;
+    // Positions of all the pixels in triangular grid coordinates (and in the order seen by
+    // the fadecandy).
+    ArrayList<DomeCoord> coords;
+
+    // Mapping of pixel grid coordinates to xy locations (world coordinates, not screen
+    // coordinates!)
+    HashMap<DomeCoord, PVector> points;
 
     // Size of a single panel's pixel grid
     int panel_size;
@@ -98,12 +103,13 @@ public class FadecandySketch<S> {
         panel_size = Config.PANEL_SIZE;
         panel_config_mode = Config.PANEL_LAYOUT;
         LayoutUtil.PanelConfig config = LayoutUtil.getPanelConfig(panel_config_mode);
-        points = config.fill(panel_size);
+        coords = config.fill(panel_size);
+        points = config.coordsToXy(coords);
         
-        LayoutUtil.generateOPCSimLayout(points, app, "layout.json");
+        LayoutUtil.generateOPCSimLayout(pixelLocationsInOrder(), app, "layout.json");
         
         radius = getRadius();
-        LayoutUtil.registerScreenSamples(opc, points, width, height, 2*radius, true);
+        registerScreenSamples();
 
         app.colorMode(app.HSB, COLOR_STEPS);
 
@@ -123,14 +129,31 @@ public class FadecandySketch<S> {
         return state;
     }
 
+    ArrayList<PVector> pixelLocationsInOrder() {
+        ArrayList<PVector> xy = new ArrayList<PVector>();
+        for (DomeCoord c : coords) {
+            xy.add(points.get(c));
+        }
+        return xy;
+    }
+
+    // For sampling from a rendered screen. Convert led positions from world coordinates to screen pixels and register with
+    // the fadecandy(ies).
+    void registerScreenSamples() {
+        opc.registerLEDs(LayoutUtil.transform(pixelLocationsInOrder(), new LayoutUtil.Transform() {
+                public PVector transform(PVector p) {
+                    return xyToScreen(p);
+                }
+            }));
+    }
+
     // Convert a screen pixel position to world coordinates.
     PVector screenToXy(PVector p) {
-        // These parameters must match registerScreenSamples() in init()
         return LayoutUtil.screenToXy(p, width, height, 2*radius, true);
     }
 
+    // Inverse of screenToXy()
     PVector xyToScreen(PVector p) {
-        // These parameters must match registerScreenSamples() in init()
         return LayoutUtil.xyToScreen(p, width, height, 2*radius, true);
     }
 

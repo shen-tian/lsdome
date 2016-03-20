@@ -10,14 +10,14 @@ import java.util.*;
 import processing.core.*;
 
 // IR is the type of the intermediate representation of the individual points to be sampled/rendered.
-public abstract class PointSampleSketch<IR, S> extends FadecandySketch<S> {
+public abstract class PointSampleSketch<IR, S> extends PixelGridSketch<S> {
 
     static final int DEFAULT_BASE_SUBSAMPLING = 1;
     static final int MAX_SUBSAMPLING = 64;
 
     // Mapping of display pixels to 1 or more actual samples that will be combined to yield that
     // display pixel's color.
-    ArrayList<ArrayList<IR>> points_ir;
+    HashMap<DomeCoord, ArrayList<IR>> points_ir;
 
     // Amount of subsampling for each display pixel.
     int base_subsampling;
@@ -42,11 +42,12 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch<S> {
     void init() {
         super.init();
 
-        points_ir = new ArrayList<ArrayList<IR>>();
+        points_ir = new HashMap<DomeCoord, ArrayList<IR>>();
         int total_subsamples = 0;
-        for (PVector p : points) {
+        for (DomeCoord c : coords) {
+            PVector p = points.get(c);
             ArrayList<IR> samples = new ArrayList<IR>();
-            points_ir.add(samples);
+            points_ir.put(c, samples);
 
             p = normalizePoint(p);
             int num_subsamples = Math.min((int)Math.ceil(base_subsampling * subsamplingBoost(p)), MAX_SUBSAMPLING);
@@ -91,13 +92,8 @@ public abstract class PointSampleSketch<IR, S> extends FadecandySketch<S> {
         return (IR)p;
     }
 
-    void draw(double t) {
-        app.background(0);
-        app.loadPixels();
-        for (int i = 0; i < points.size(); i++) {
-            app.pixels[opc.pixelLocations[i]] = sampleAntialiased(points_ir.get(i), t);
-        }
-        app.updatePixels();
+    int drawPixel(DomeCoord c, double t) {
+        return sampleAntialiased(points_ir.get(c), t);
     }
 
     // Perform the anti-aliasing for a single display pixel.

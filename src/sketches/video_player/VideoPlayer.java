@@ -57,7 +57,7 @@ public class VideoPlayer extends FadecandySketch<Object> implements OPC.FramePos
         double xmax = -radius;
         double ymin = radius;
         double ymax = -radius;
-        for (PVector p : points) {
+        for (PVector p : points.values()) {
             xmin = Math.min(xmin, p.x);
             xmax = Math.max(xmax, p.x);
             ymin = Math.min(ymin, p.y);

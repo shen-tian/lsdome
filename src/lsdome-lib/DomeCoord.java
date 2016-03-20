@@ -18,6 +18,15 @@ public class DomeCoord {
         this.pixel = pixel;
     }
 
+    TriCoord getCoord(CoordType type) {
+        switch (type) {
+        case UNIVERSAL: return universal;
+        case PANEL: return panel;
+        case PIXEL: return pixel;
+        default: throw new RuntimeException();
+        }
+    }
+
     public boolean equals(Object o) {
         if (o instanceof TriCoord) {
             DomeCoord dc = (DomeCoord)o;

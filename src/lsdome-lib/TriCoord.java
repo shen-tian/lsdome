@@ -141,6 +141,15 @@ public class TriCoord {
         return LayoutUtil.V(u, v);
     }
 
+    int getAxis(Axis ax) {
+        switch (ax) {
+        case U: return u;
+        case V: return v;
+        case W: return w;
+        default: throw new RuntimeException();
+        }
+    }
+
     public boolean equals(Object o) {
         if (o instanceof TriCoord) {
             TriCoord tc = (TriCoord)o;

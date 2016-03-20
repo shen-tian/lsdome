@@ -130,7 +130,7 @@ public class LayoutUtil {
     */
 
     static ArrayList<DomeCoord> fillTriangle(final PVector entry, final int rot, int n) {
-        // TODO reuseable?
+        // TODO reuseable/deriveable?
         int[][] offsets = {{0, 0, -1}, {-1, 0, -1}, {-1, 0, 0}, {-1, -1, 0}, {0, -1, 0}, {0, -1, -1}};
 
         int u0 = (int)entry.x;
@@ -221,10 +221,14 @@ public class LayoutUtil {
     static abstract class PanelConfig {
         double radius;  // Max radius of panel configuration, in panel lengths
         int[] arms;     // Number of panels per fadecandy 'arm'
+        PVector origin;
+        double theta;
 
-        public PanelConfig(int num_panels, double radius, int[] arms) {
+        public PanelConfig(int num_panels, double radius, int[] arms, PVector origin, double theta) {
             this.radius = radius;
             this.arms = arms;
+            this.origin = origin;
+            this.theta = theta;
 
             int panel_count = 0;
             for (int n : arms) {
@@ -234,37 +238,50 @@ public class LayoutUtil {
         }
 
         // Fill the lsdome configuration with pixels
-        abstract ArrayList<PVector> fill(int n);
+        abstract ArrayList<DomeCoord> fill(int n);
+
+        HashMap<DomeCoord, PVector> coordsToXy(ArrayList<DomeCoord> coords) {
+            HashMap<DomeCoord, PVector> coordToPoint = new HashMap<DomeCoord, PVector>();
+            PVector offset = axialToXy(origin);
+            for (DomeCoord c : coords) {
+                PVector p = Vrot(Vsub(coordToXy(c), offset), Math.toRadians(theta));
+                coordToPoint.put(c, p);
+            }
+            return coordToPoint;
+        }
     }
 
     // Note: this layout is off-center.
     static PanelConfig _2 = new PanelConfig(2,
                                             2./3.*SQRT_3,
-                                            new int[] {2}) {
-            ArrayList<PVector> fill(int n) {
-                return transform(coordsToXy(fillFan(0, 2, n)), translate(axialToXy(V(-1/3., -1/3.))));
+                                            new int[] {2},
+                                            V(1/3., 1/3.), 0.) {
+            ArrayList<DomeCoord> fill(int n) {
+                return fillFan(0, 2, n);
             }
         };
     static PanelConfig _13 = new PanelConfig(13,
                                              Math.sqrt(7/3.),  // just trust me
-                                             new int[] {4, 4, 4, 1}) {
-            ArrayList<PVector> fill(int n) {
+                                             new int[] {4, 4, 4, 1},
+                                             V(1/3., 1/3.), 0.) {
+            ArrayList<DomeCoord> fill(int n) {
                 final PVector[] entries = {V(1, 0), V(0, 1), V(0, 0)};
-                ArrayList<PVector> points = new ArrayList<PVector>();
+                ArrayList<DomeCoord> points = new ArrayList<DomeCoord>();
                 for (int i = 0; i < 3; i++) {
-                    points.addAll(coordsToXy(fillFan(2*i+1, 4, n, entries[i])));
+                    points.addAll(fillFan(2*i+1, 4, n, entries[i]));
                 }
-                points.addAll(coordsToXy(fillTriangle(V(0, 0), 0, n)));
-                return transform(points, translate(axialToXy(V(-1/3., -1/3.))));
+                points.addAll(fillTriangle(V(0, 0), 0, n));
+                return points;
             }
         };
     static PanelConfig _24 = new PanelConfig(24,
                                              2.,
-                                             new int[] {4, 4, 4, 4, 4, 4}) {
-            ArrayList<PVector> fill(int n) {
-                ArrayList<PVector> points = new ArrayList<PVector>();
+                                             new int[] {4, 4, 4, 4, 4, 4},
+                                             V(0, 0), 0.) {
+            ArrayList<DomeCoord> fill(int n) {
+                ArrayList<DomeCoord> points = new ArrayList<DomeCoord>();
                 for (int i = 0; i < 6; i++) {
-                    points.addAll(coordsToXy(fillFan(i, 4, n)));
+                    points.addAll(fillFan(i, 4, n));
                 }
                 return points;
             }
@@ -342,17 +359,6 @@ public class LayoutUtil {
         double r = p.x;
         double theta = p.y;
         return Vrot(V(r, 0), theta);
-    }
-
-    // For sampling from a rendered screen. Convert led positions from world coordinates to screen pixels and register with
-    // the fadecandy(ies).
-    static void registerScreenSamples(OPC opc, ArrayList<PVector> points,
-                                      final int width, final int height, final double span, final boolean horizSpan) {
-        opc.registerLEDs(transform(points, new Transform() {
-                public PVector transform(PVector p) {
-                    return xyToScreen(p, width, height, span, horizSpan);
-                }
-            }));
     }
     
     // Return the adjacent axial coordinate moving from 'p' in direction 'rot'
