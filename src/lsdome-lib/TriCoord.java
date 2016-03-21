@@ -87,7 +87,7 @@ public class TriCoord {
         }
 
         int sum = u + v + w;
-        assert sum == checksum(PanelOrientation.A) || sum == checksum(PanelOrientation.B);
+        assert sum == checksum(PanelOrientation.A) || sum == checksum(PanelOrientation.B) : String.format("%d %d %d", u, v, w);
     }
 
     // Build a coordinate from just two of the axes and the orientation.
