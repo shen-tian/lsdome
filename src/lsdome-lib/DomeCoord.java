@@ -35,7 +35,7 @@ public class DomeCoord {
     }
 
     public boolean equals(Object o) {
-        if (o instanceof TriCoord) {
+        if (o instanceof DomeCoord) {
             DomeCoord dc = (DomeCoord)o;
             return universal.equals(dc.universal);
         } else {

@@ -153,6 +153,16 @@ public class TriCoord {
         return TriCoord.fromParts(type, newAx1, newVal1, newAx2, newVal2, newO, panel_length);
     }
 
+    // Flip about an axis.
+    TriCoord flip(Axis axis) {
+        switch (axis) {
+        case U: return TriCoord.fromParts(type, Axis.U, u, Axis.V, w, getOrientation(), panel_length);
+        case V: return TriCoord.fromParts(type, Axis.V, v, Axis.W, u, getOrientation(), panel_length);
+        case W: return TriCoord.fromParts(type, Axis.W, w, Axis.U, v, getOrientation(), panel_length);
+        default: throw new RuntimeException();
+        }
+    }
+
     static TriCoord toUniversal(TriCoord panel, TriCoord pixel) {
         assert panel.type == CoordType.PANEL;
         assert pixel.type == CoordType.PIXEL;
