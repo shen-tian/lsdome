@@ -40,7 +40,7 @@ Use the files in `/src/config` as templates, depending on the actual panel confi
 The TP-Link MR3040 is a neat little device. It's a battery powered WiFi AP/Router, with one USB 2.0 port, one BASE100 ethernet port, and a 1x1 radio. Compared to a Pi, this has:
 
 * Built in LiPo battery/charger;
-* WiFi AP (only 2.4Ghz 802.11n though);
+* WiFi AP (only 2.4Ghz 802.11n, but doubt frequency saturation is a problem in the desert);
 * A bit cheaper at time of writing (~$30 v.s. $40);
 * Comes in a case;
 * Only one USB 2.0 port, so we need a hub.
