@@ -20,8 +20,8 @@ class Boid {
     velocity = new PVector(cos(angle), sin(angle));
 
     location = new PVector(x, y);
-    r = 2.0;
-    maxspeed = 2;
+    r = 6.0;
+    maxspeed = 1;
     maxforce = 0.03;
   }
 
@@ -101,16 +101,16 @@ class Boid {
 
   // Wraparound
   void borders() {
-    if (location.x < -r) location.x = width+r;
-    if (location.y < -r) location.y = height+r;
-    if (location.x > width+r) location.x = -r;
-    if (location.y > height+r) location.y = -r;
+    if ((location.x) < -r*1.5) location.x = width+r;
+    if ((location.y) < -r*1.5) location.y = height+r;
+    if ((location.x) > ((width+r)*1.5)) location.x = -r;
+    if ((location.y) > ((height+r)*1.5)) location.y = -r;
   }
 
   // Separation
   // Method checks for nearby boids and steers away
   PVector separate (ArrayList<Boid> boids) {
-    float desiredseparation = 25.0f;
+    float desiredseparation = 20.0f;
     PVector steer = new PVector(0, 0, 0);
     int count = 0;
     // For every boid in the system, check if it's too close
