@@ -8,21 +8,33 @@ class Boid {
   float r;
   float maxforce;    // Maximum steering force
   float maxspeed;    // Maximum speed
+  int currentHue;
+  
+  int sat = 90 + (COLOUR_RANGE - (int)random(COLOUR_RANGE*2));
+  int light = 75;
+  int hueOffset = (COLOUR_RANGE - (int)random(COLOUR_RANGE*2));
+  
+  float sepWeight = 1.5;
+  float aliWeight = 1.0;
+  float cohWeight = 1.0;
 
-    Boid(float x, float y) {
+  static final float OFFSCREEN_SPACE = 100; //how much bigger the universe is in each dimension than the viewport
+  static final float BOID_SIZE = 6.0; //how big the boids are
+  static final int MAX_SPEED = 1; //how fast the boids can move
+  static final int COLOUR_RANGE = 10; //hue, saturation and brightness values for visible boids can be current +- this
+
+  int[] boidColor;
+
+  Boid(float x, float y, int hue) {
     acceleration = new PVector(0, 0);
-
-    // This is a new PVector method not yet implemented in JS
-    // velocity = PVector.random2D();
-
-    // Leaving the code temporarily this way so that this example runs in JS
-    float angle = random(TWO_PI);
-    velocity = new PVector(cos(angle), sin(angle));
-
+    velocity = PVector.random2D();
     location = new PVector(x, y);
-    r = 6.0;
-    maxspeed = 1;
+
+    r = BOID_SIZE;
+    maxspeed = MAX_SPEED;
     maxforce = 0.03;
+
+    currentHue = hue;
   }
 
   void run(ArrayList<Boid> boids) {
@@ -30,6 +42,15 @@ class Boid {
     update();
     borders();
     render();
+  }
+
+  void setHue(int hue) {
+    currentHue = hue;
+  }
+  
+  void setBrightness(int brightness) {
+    light = brightness;
+    sat = brightness;
   }
 
   void applyForce(PVector force) {
@@ -43,9 +64,9 @@ class Boid {
     PVector ali = align(boids);      // Alignment
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
-    sep.mult(1.5);
-    ali.mult(1.0);
-    coh.mult(1.0);
+    sep.mult(sepWeight);
+    ali.mult(sepWeight);
+    coh.mult(aliWeight);
     // Add the force vectors to acceleration
     applyForce(sep);
     applyForce(ali);
@@ -61,6 +82,7 @@ class Boid {
     location.add(velocity);
     // Reset accelertion to 0 each cycle
     acceleration.mult(0);
+    //update color
   }
 
   // A method that calculates and applies a steering force towards a target
@@ -81,12 +103,21 @@ class Boid {
     return steer;
   }
 
+  int[] getColour() {
+    int hue = currentHue + hueOffset;
+    int[] col = new int[] {
+      hue, sat, light, 100
+    };
+    return col;
+  }
+
   void render() {
     // Draw a triangle rotated in the direction of velocity
     float theta = velocity.heading2D() + radians(90);
     // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
-    
-    fill(60, 68,79, 100);
+
+    int[] col = getColour();
+    fill(col[0], col[1], col[2], col[3]);
     stroke(255);
     pushMatrix();
     translate(location.x, location.y);
@@ -101,10 +132,10 @@ class Boid {
 
   // Wraparound
   void borders() {
-    if ((location.x) < -r*1.5) location.x = width+r;
-    if ((location.y) < -r*1.5) location.y = height+r;
-    if ((location.x) > ((width+r)*1.5)) location.x = -r;
-    if ((location.y) > ((height+r)*1.5)) location.y = -r;
+    if ((location.x) < -r-OFFSCREEN_SPACE) location.x = width+r;
+    if ((location.y) < -r-OFFSCREEN_SPACE) location.y = height+r;
+    if ((location.x) > ((width+r)+OFFSCREEN_SPACE)) location.x = -r;
+    if ((location.y) > ((height+r)+OFFSCREEN_SPACE)) location.y = -r;
   }
 
   // Separation
@@ -171,8 +202,7 @@ class Boid {
       PVector steer = PVector.sub(sum, velocity);
       steer.limit(maxforce);
       return steer;
-    } 
-    else {
+    } else {
       return new PVector(0, 0);
     }
   }
@@ -193,8 +223,7 @@ class Boid {
     if (count > 0) {
       sum.div(count);
       return seek(sum);  // Steer towards the location
-    } 
-    else {
+    } else {
       return new PVector(0, 0);
     }
   }
