@@ -6,7 +6,7 @@ AudioInput in;
 FFT fft;
 float[] fftFilter;
 float decay = 0.97;
-float minBrightness = 35;
+float minBrightness = 50;
 float brightnessScale = 300;
 BeatDetect beat;
 
@@ -15,7 +15,7 @@ Flock flock;
 static final int startHue = 60;
 
 int time;
-int wait = 500;
+int wait = 100;
 
 void setup() {
   minim = new Minim(this);

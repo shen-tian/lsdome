@@ -65,8 +65,8 @@ class Boid {
     PVector coh = cohesion(boids);   // Cohesion
     // Arbitrarily weight these forces
     sep.mult(sepWeight);
-    ali.mult(sepWeight);
-    coh.mult(aliWeight);
+    ali.mult(aliWeight);
+    coh.mult(cohWeight);
     // Add the force vectors to acceleration
     applyForce(sep);
     applyForce(ali);
@@ -118,7 +118,6 @@ class Boid {
 
     int[] col = getColour();
     fill(col[0], col[1], col[2], col[3]);
-    stroke(255);
     pushMatrix();
     translate(location.x, location.y);
     rotate(theta);
