@@ -1,11 +1,11 @@
 import java.util.*;
 import processing.core.*;
 
-public class Kaleidoscope extends PixelGridSketch<Object> {
+public class KaleidoscopeSketch extends PixelGridSketch<Object> {
 
     TriCoord basePanel;
 
-    public Kaleidoscope(PApplet app, int size_px) {
+    public KaleidoscopeSketch(PApplet app, int size_px) {
         super(app, size_px);
 
         basePanel = new TriCoord(CoordType.PANEL, 0, 0, -1);

@@ -1,4 +1,4 @@
-FadecandySketch driver = new Kaleidoscope(this, 300);
+FadecandySketch driver = new KaleidoscopeSketch(this, 300);
 
 void setup() {
   driver.init();
