@@ -38,6 +38,10 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
             return drawRing(p, t);
         case 2:
             return drawDot(p, t);
+        case 3:
+            return drawMoire(p, t);
+        case 4:
+            return drawNoire(p, t);
         default:
             throw new RuntimeException();
         }
@@ -55,6 +59,12 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
             }
             if (app.key == 'd') {
                 mode = 2;
+            }
+            if (app.key == 'm') {
+                mode = 3;
+            }
+            if (app.key == 'n') {
+                mode = 4;
             }
         }
     }
@@ -122,7 +132,7 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     }
 
     int drawDot(PVector p, double t) {
-        boolean track_mouse = true;
+        boolean track_mouse = true;  
         double minRadius = .2;
         double maxRadius = .5;
         double pulsePeriod = 1.5;  //s
@@ -136,14 +146,73 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         PVector center;
         if (track_mouse) {
             center = normalizePoint(screenToXy(LayoutUtil.V(app.mouseX, app.mouseY)));
-        } else {
+        }
+        else
+        {
             center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
         }
+        
         double dist = LayoutUtil.Vsub(p, center).mag();
         double k = (dist > radius ? 0. : cyclicValue(dist, 2*radius));
 
         return color(hue, sat, k);
     }
+
+
+    // Return a value from 1 to 0 and back gain as x moves from 0 to 'period'
+    double moireCyclicValue(double x, double period) {
+        double val = (Math.exp(Math.sin(x*x/2000.0*Math.PI)) - 0.36787944)*108.0;
+        double variance = 0.001;
+      
+        return (variance*val);//(Math.cos(x / period * 2*Math.PI)));
+    }
+
+    int drawMoire(PVector p, double t) {
+        double minRadius = .2;
+        double maxRadius = .5;
+        double radialPeriod = 20;  //s
+        double rotPeriod = 7.3854;  //s
+        double hue = 0.1*t;
+        double sat = 0.1*t;
+        
+        double radius =     minRadius  *  moireCyclicValue(t, rotPeriod )  ;//+ n*0.0001*Math.sin(t);
+                        
+        PVector center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
+        double dist = LayoutUtil.Vsub(p, center).mag();
+        double k = cyclicValue(dist, radius);
+
+        return color(hue, sat, k);
+    }
+
+
+    // Return a value from 1 to 0 and back gain as x moves from 0 to 'period'
+    double noireCyclicValue(double x, double period) {
+        double val = (Math.exp(Math.sin(x*x/2000.0*Math.PI)) - 0.36787944)*108.0;
+        double variance = 0.001;
+      
+        return (variance*val);
+    }
+
+
+    int drawNoire(PVector p, double t) {
+        double minRadius = .2;
+        double maxRadius = .5;
+        double radialPeriod = 20;  //s
+        double rotPeriod = 7.3854;  //s
+        double hue = 0.1*t;
+        double sat = 0.1*t;
+        
+        double radius = minRadius  *  noireCyclicValue(t, rotPeriod ) ;
+                        
+        PVector center = LayoutUtil.Vrot(LayoutUtil.V(0, 0), 1);
+        double dist = LayoutUtil.Vsub(p, center).mag();
+        double k = cyclicValue(dist, radius);
+
+        return color(hue, sat, k);
+    }
+
+
+
 
     double fractalNoise(double x, double y, double z) {
         double r = 0;
