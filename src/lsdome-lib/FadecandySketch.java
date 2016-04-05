@@ -96,7 +96,7 @@ public class FadecandySketch<S> {
     void init() {
         app.size(width, height, app.P2D);
 
-        String hostname = Config.FADECANDY_HOST;
+        String hostname = Config.getConfig().FADECANDY_HOST;
         int port = 7890;
         opc = new OPC(app, hostname, port);
 
