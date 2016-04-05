@@ -39,7 +39,7 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         case 2:
             return drawDot(p, t);
         case 3:
-            return drawMoire(p, t);
+            return drawIDontEvenKnow(p, t);
         case 4:
             return drawNoire(p, t);
         default:
@@ -164,10 +164,10 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         double val = (Math.exp(Math.sin(x*x/2000.0*Math.PI)) - 0.36787944)*108.0;
         double variance = 0.001;
       
-        return (variance*val);//(Math.cos(x / period * 2*Math.PI)));
+        return (variance*val);
     }
 
-    int drawMoire(PVector p, double t) {
+    int drawIDontEvenKnow(PVector p, double t) {
         double minRadius = .2;
         double maxRadius = .5;
         double radialPeriod = 20;  //s
@@ -175,13 +175,24 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         double hue = 0.1*t;
         double sat = 0.1*t;
         
-        double radius =     minRadius  *  moireCyclicValue(t, rotPeriod )  ;//+ n*0.0001*Math.sin(t);
+        
+        double scale = .9;
+        double z = scale;
+        double n = fractalNoise(state.dx + p.x*scale, state.dy + p.y*scale, z);
+        
+        double radius =     minRadius  *  0.5*moireCyclicValue(t, rotPeriod ) ;
                         
-        PVector center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
+        PVector center = LayoutUtil.Vrot(LayoutUtil.V(1, 0),0);
         double dist = LayoutUtil.Vsub(p, center).mag();
-        double k = cyclicValue(dist, radius);
 
-        return color(hue, sat, k);
+        double sqr = Math.pow(n, 2);
+        return color(
+                     MathUtil.fmod(hue + n, 0.9), 
+                     hue*(1. - constrain(sqr, 0, 0.9)), 
+                     cyclicValue(dist, hue*(1- constrain(sqr, 0, 0.9)))
+                     );
+        
+        
     }
 
 
@@ -209,6 +220,7 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         double k = cyclicValue(dist, radius);
 
         return color(hue, sat, k);
+        
     }
 
 
