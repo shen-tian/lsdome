@@ -24,7 +24,6 @@ public class Config {
             FADECANDY_HOST = properties.getProperty("opcHost");
         } catch (IOException e) {
             // do nothing. Use defaults. Meh.
-            e.printStackTrace(System.out);
         }
         System.out.println(System.getProperty("user.dir"));
         System.out.println(FADECANDY_HOST);
