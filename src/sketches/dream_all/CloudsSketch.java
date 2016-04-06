@@ -46,11 +46,9 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
             throw new RuntimeException();
         }
     }
-
-    void beforeFrame(double t) {
-        hud = false;
+    
+    void processKeyInput(){
         if (app.keyPressed) {
-            hud = (app.key == 'v' || app.key == 'V');
             if (app.key == 'c') {
                 mode = 0;
             }
@@ -69,16 +67,11 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
         }
     }
 
+    void beforeFrame(double t) {
+
+    }
+
     void afterFrame(double t) {
-        if (hud) {
-            // Show the FPS
-            int txtSize = 16;
-            app.textSize(txtSize);
-            app.fill(0, 100, 100);
-            app.text((int)app.frameRate + "fps", 2, (txtSize + 2)); 
-            app.text("dx " + state.dx, 2, (txtSize + 2) * 2);
-            app.text("dy " + state.dy, 2, (txtSize + 2) * 3);
-        }
     }
 
     int drawCloud(PVector p, double t) {

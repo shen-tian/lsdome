@@ -112,7 +112,7 @@ public class FadecandySketch<S> {
         registerScreenSamples();
 
         app.colorMode(app.HSB, COLOR_STEPS);
-
+        
         state = initialState();
     }
 
@@ -175,9 +175,10 @@ public class FadecandySketch<S> {
         draw(t);
         afterFrame(t);
 
-        if (Config.DEBUG) {
-            System.out.println(app.frameRate);
-        }
+        // The HUD: think this space is (almost) never mapped to pixels.
+        app.fill(0,0,100);
+        app.text("opc @" + opc.host, 100, app.height - 10);
+        app.text(String.format("%.1ffps", app.frameRate), 10, app.height - 10);
     }
 
     void _updateState(double t) {
