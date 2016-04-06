@@ -198,7 +198,7 @@ public class FadecandySketch<S> {
 
     // **OVERRIDE** this with your sketch's drawing code. 't' is the global clock in seconds.
     void draw(double t) {
-        System.out.println("nothing to draw");
+        //System.out.println("nothing to draw");
     }
 
     // **OVERRIDE** to handle keyboard input.

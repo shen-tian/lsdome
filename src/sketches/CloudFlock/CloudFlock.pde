@@ -90,6 +90,9 @@ void draw() {
       cycleHue();
       hueTime = millis();
     }
+    
+  
+    driver.draw();
 }
 
 void cycleHue() {

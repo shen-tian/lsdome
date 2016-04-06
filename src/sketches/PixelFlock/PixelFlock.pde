@@ -64,5 +64,6 @@ void draw() {
        time = millis();
     }
   }
+  driver.draw();
 }
 
