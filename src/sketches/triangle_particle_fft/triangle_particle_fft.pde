@@ -5,7 +5,7 @@
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 
-FadecandySketch driver = new FadecandySketch(this, 250, 250);
+FadecandySketch driver = new ParticleFFTSketch(this, 300);
 
 PImage dot;
 PImage colors;
@@ -17,8 +17,6 @@ AudioInput in;
 FFT fft;
 float[] fftFilter;
 
-//String filename = "083_trippy-ringysnarebeat-3bars.mp3";
-String filename = "/Users/Shen/kafkaf.mp3";
 float spin = 0.001;
 float radiansPerBucket = radians(2);
 float decay = 0.97;
@@ -76,5 +74,6 @@ void draw()
 
     image(dot, center.x - size/2, center.y - size/2, size, size);
   }
+  driver.draw();
 }
 

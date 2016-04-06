@@ -3,7 +3,7 @@
  * https://github.com/scanlime/fadecandy/tree/master/examples/processing/grid24x8z_clouds
  */
 
-CloudsSketch driver = new CloudsSketch(this, 600);
+CloudsSketch driver = new CloudsSketch(this, 300);
 
 void setup() {
   driver.init();
