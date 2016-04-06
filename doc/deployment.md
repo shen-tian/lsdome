@@ -47,7 +47,13 @@ The TP-Link MR3040 is a neat little device. It's a battery powered WiFi AP/Route
 
 In place of Raspbian for the Pis, we can use OpenWRT on it. Some one ported `fcserver` to run on it [here](https://github.com/nemik/fadecandy-openwrt) with [instructions here](http://blog.nemik.net/2014/02/standalone-openwrt-fadecandy-server-for-led-control/).
 
-Need to check the performance, but suspect it should be OK.
+Performance seems OK with the 1560 LED setup, across 4 Fadecandies.
+
+Following the gide, we should be able to connect via the `Fadecandy` SSID. However, the GUI is disabled by default, so SSH into `192.168.2.1` with `root:root` to config. Use `scp` to copy `/src/config/13panel-fc.json` to `/etc/fcserver.json` (check this part). Reboot the MR3040 and be done.
+
+Note on using the MR3040 in its default configuration: you can configure it to do pretty much what you like, but you need to know how it works a bit. By default, it sits on two subnets (is that right?). One is connected to the WiFi radio, where it acts as DHCP server. Connect to this "in the field" where there's no network infrastructure. The ethernet port, on the other hand, accepts DHCP leases, so it will join your existing network. It might take a bit of effort to find its IP, but use this "in the lab", since you can connect to both it and the internet. 
+
+We are using an [Amazon Basic 4-port USB 3.0 hub](http://www.amazon.com/AmazonBasics-Port-2-5A-power-adapter/dp/B00DQFGH80/) to connect the 4 Fadecandies, no external power required.
 
 ## Steps taken to run sketches on Raspbian
 
