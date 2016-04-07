@@ -13,10 +13,12 @@ public class SegmentFFTSketch extends FadecandySketch<Object> {
 
     float spin = 0.001f;
     float radiansPerBucket = (float)Math.PI/180f;
-    float decay = 0.97f;
+    float decay = 0.9f;
     float opacity = 10.f;
     float minSize = 0.1f;
     float sizeScale = 0.2f;
+    
+    float angleCover = 500;
 
     // raw input
     float[] fftBands;
@@ -41,7 +43,7 @@ public class SegmentFFTSketch extends FadecandySketch<Object> {
         colors2 = loadImage("colors2.png");
         colors3 = loadImage("colors3.png");
 
-        colors = colors1;
+        colors = colors2;
     }
 
     void draw(double t) {
@@ -55,7 +57,7 @@ public class SegmentFFTSketch extends FadecandySketch<Object> {
         for (int i = 0; i < fftFilter.length; i += 3) {   
             color rgb = colors.get(int(map(i, 0, fftFilter.length-1, 0, colors.width-1)), colors.height/2);
             tint(rgb, fftFilter[i] * opacity);
-            blendMode(REPLACE);
+            blendMode(ADD);
 
             float size = height * (minSize + sizeScale * fftFilter[i]);
             PVector center = new PVector(width * (fftFilter[i] * 0.2), 0);
@@ -65,11 +67,14 @@ public class SegmentFFTSketch extends FadecandySketch<Object> {
             center.rotate(angle);
             center.add(new PVector(width * 0.5, height * 0.5));
             
-            fill(rgb);
-            noStroke();
+            noFill();
+            stroke(rgb);
+            //strokeCap(SQUARE);
+            //strokeWeight(2);
+            //noStroke();
 
-            arc(width/2, height/2, size, size, angle - size/200, angle + size/200, PIE);
-            arc(width/2, height/2, size, size, PI + angle - size/200, PI + angle + size/200, PIE);
+            arc(width/2, height/2, size, size, angle - size/angleCover, angle + size/angleCover);
+            arc(width/2, height/2, size, size, PI + angle - size/angleCover, PI + angle + size/angleCover);
             //image(dot, center.x - size/2, center.y - size/2, size, size);
         }
     }
