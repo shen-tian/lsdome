@@ -7,12 +7,9 @@
 # that up via JSON on at TCP socket. Can probably get fancier, but works for now.
 
 import logging
-import sys
-import threading
 import SocketServer
-from time import sleep
+import threading
 import time
-import datetime
 import json
 import PyNUT
 import csv
@@ -46,6 +43,7 @@ class EchoRequestHandler(SocketServer.BaseRequestHandler):
             return
             
 def pollUps():
+    # Hardcoded for now.
     nut = PyNUT.PyNUTClient( host="192.168.1.125", login="monuser", password="password")
     ofile = open(os.path.expanduser('~') + '/powerlog.csv', "ab+")
     writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -57,17 +55,18 @@ def pollUps():
             'output.voltage'}
         outputList = list()
         outputList.append(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(time.time())))
+
         for param in paramList:
             upsData[param] = result[param]
             outputList.append(result[param])
         writer.writerow(outputList)
-        sleep(1.)
+        time.sleep(1.)
     return    
 
 
 if __name__ == '__main__':
     import socket
-    import threading
+
     
     d = threading.Thread(target=pollUps)
     d.setDaemon(True)
@@ -75,16 +74,13 @@ if __name__ == '__main__':
     
     logging.info('Started polling thread')
     
-    address = ('localhost', 5204) # let the kernel give us a port
+    address = ('localhost', 5204)
     server = SocketServer.TCPServer(address, EchoRequestHandler)
-    #ip, port = server.server_address # find out what port we were given
 
     d2 = threading.Thread(target=server.serve_forever)
     d2.setDaemon(True)
     d2.start()
     
-    logging.info("Both threads started. Press any key to exit")
+    logging.info("Both threads started. Press enter")
     
     x = raw_input('Enter stuff to exit')
-
-    #server.serve_forever()
