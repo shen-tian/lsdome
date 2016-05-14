@@ -28,7 +28,6 @@ def getPowerData():
         "batt.charge" : upsData['battery.charge'],
         "output.power" : float(upsData['output.current']) * float(upsData['output.voltage'])}
     return json.dumps(powerData)
-    #return "meh"
     
 class EchoRequestHandler(SocketServer.BaseRequestHandler):
 
@@ -46,6 +45,7 @@ def pollUps():
     # Hardcoded for now.
     nut = PyNUT.PyNUTClient( host="192.168.1.125", login="monuser", password="password")
     ofile = open(os.path.expanduser('~') + '/powerlog.csv', "ab+")
+    
     writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     while 1:
         result = nut.GetUPSVars( "openups" )
@@ -65,8 +65,6 @@ def pollUps():
 
 
 if __name__ == '__main__':
-    import socket
-
     
     d = threading.Thread(target=pollUps)
     d.setDaemon(True)
