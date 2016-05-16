@@ -13,7 +13,7 @@ import time
 import json
 import PyNUT
 import csv
-import os
+import sys
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -21,64 +21,71 @@ logging.basicConfig(level=logging.INFO,
 
 upsData = {}
 
-def getPowerData():
-    
-    powerData = {
-        "ups.status" : upsData['ups.status'], 
-        "batt.charge" : upsData['battery.charge'],
-        "output.power" : float(upsData['output.current']) * float(upsData['output.voltage'])}
-    return json.dumps(powerData)
-    
-class EchoRequestHandler(SocketServer.BaseRequestHandler):
 
+def get_power_data():
+    power_data = {
+        "ups.status": upsData['ups.status'],
+        "batt.charge": upsData['battery.charge'],
+        "output.power": float(upsData['output.current']) * float(upsData['output.voltage'])}
+    return json.dumps(power_data)
+
+
+class EchoRequestHandler(SocketServer.BaseRequestHandler):
     def handle(self):
         logging.info('New socket connection')
         try:
             while True:
-                data = self.request.recv(1024)
-                self.request.send(getPowerData())
+                self.request.recv(1024)
+                self.request.send(get_power_data())
         finally:
             logging.info('Closing')
             return
-            
-def pollUps():
+
+
+def pollUps(logfile='/var/log/powerlog.csv'):
     # Hardcoded for now.
-    nut = PyNUT.PyNUTClient( host="192.168.1.125", login="monuser", password="password")
-    ofile = open(os.path.expanduser('~') + '/powerlog.csv', "ab+")
-    
+    nut = PyNUT.PyNUTClient(host="127.0.0.1", login="monuser", password="password")
+    ofile = open(logfile, "ab+")
+
     writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     while 1:
-        result = nut.GetUPSVars( "openups" )
+        result = nut.GetUPSVars("openups")
         global upsData
-        paramList = {'ups.status', 'battery.charge', 'battery.current', 'battery.voltage',
-            'battery.temperature', 'input.current', 'input.voltage', 'output.current',
-            'output.voltage'}
-        outputList = list()
-        outputList.append(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(time.time())))
+        param_list = ['ups.status', 'battery.charge', 'battery.current', 'battery.voltage',
+                      'battery.temperature', 'input.current', 'input.voltage', 'output.current',
+                      'output.voltage']
+        output_list = list()
+        output_list.append(time.strftime("%Y/%m/%d %H:%M:%S", time.localtime(time.time())))
 
-        for param in paramList:
+        for param in param_list:
             upsData[param] = result[param]
-            outputList.append(result[param])
-        writer.writerow(outputList)
+            output_list.append(result[param])
+        writer.writerow(output_list)
         time.sleep(1.)
-    return    
+    return
 
 
-if __name__ == '__main__':
-    
-    d = threading.Thread(target=pollUps)
+def main(argv):
+    logfile = argv[0]
+
+    d = threading.Thread(target=pollUps, args=(logfile,))
     d.setDaemon(True)
     d.start()
-    
+
     logging.info('Started polling thread')
-    
-    address = ('localhost', 5204)
+
+    address = ('0.0.0.0', 5204)
     server = SocketServer.TCPServer(address, EchoRequestHandler)
 
     d2 = threading.Thread(target=server.serve_forever)
     d2.setDaemon(True)
     d2.start()
-    
+
     logging.info("Both threads started. Press enter")
-    
-    x = raw_input('Enter stuff to exit')
+
+    while 1:
+        time.sleep(5)
+
+
+if __name__ == '__main__':
+    main(sys.argv[1:])

@@ -20,15 +20,17 @@ void setup() {
   dot = loadImage("color-dot.png");
 
   // Connect to the local instance of fcserver
-  opc = new OPC(this, "192.168.1.116", 7890);
+  opc = new OPC(this, "192.168.1.125", 7890);
 
   // Map one 64-LED strip to the center of the window
   opc.ledGrid(0,25,2, width/2, height/2, width / 30., width / 30. ,0, true);
  
  level = 255;
+ last = 0;
 }
 
 int level;
+int last;
 
 void draw() {
   // Create an alpha blended background
@@ -40,7 +42,7 @@ void draw() {
   //float n = random(0,width);  // Try this line instead of noise
   
   // Get a noise value based on xoff and scale it according to the window's width
-  float n = (PerlinNoise_1D(xoff)/2 + .5)*width;
+  float n = (PerlinNoise_1D(xoff)/2 + .5);
   // With each cycle, increment xoff
   xoff += xincrement;
   
@@ -48,17 +50,38 @@ void draw() {
   fill(200);
   //ellipse(n,height/2,100,100);
   
-  tint(255, 32);
-  image(dot, width/2 - 200, height/2 - 20, 400, 40);
+  tint(255, level);
+  image(dot, width/2 - 225 + n * 50, height/2 - 20, 400, 40);
   
   myClient.write("UPS State");
   String state = myClient.readString();
   if (state != null){
       try {
           JSONObject json = parseJSONObject(state);
+          
+          
+          float maxPwr = 10;
+          if (json.getString("ups.status").indexOf("OB") != -1)
+              maxPwr = 4.;
+          else
+              maxPwr = 10;
+          int nowTime = millis();
+          if (nowTime - last > 1000)
+          {
+               last = nowTime;
+              float pwr = json.getFloat("output.power");
+          
+              if (pwr < maxPwr - .1)
+                  level = min (level + 5, 255);
+               
+              if (pwr > maxPwr + .1)
+                  level = max (level - 5, 0);
+          }
+          
           text(String.format("Battery charge: %s", json.getString("batt.charge")), 10, 10);
           text(String.format("UPS Status    : %s", json.getString("ups.status")), 10, 30);
           text(String.format("Power draw: %.2fw", json.getFloat("output.power")), 10, 50);
+          text(String.format("Power level:    %d", level), 10, 70);
       }
       catch (Exception e)
       {
