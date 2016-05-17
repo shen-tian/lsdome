@@ -3,7 +3,7 @@
 
 # Power management capability: uses NUT to monitor the power state of the system, and
 # do smart things based off of that (mostly dim some lights).
-# Grabs some data fields (battery charge %, UPS status, and current power drain. Serves
+# Grabs some data fields (battery charge %, UPS status, and current power drain). Serves
 # that up via JSON on at TCP socket. Can probably get fancier, but works for now.
 
 import logging
@@ -43,10 +43,9 @@ class EchoRequestHandler(SocketServer.BaseRequestHandler):
             return
 
 
-def poll_ups(nut_server):
+def poll_ups(nut_server, log_file):
     nut_login = "monuser"
     nut_password = "password"
-    logfile = 'powerlog.csv'
 
     # polling and logging frequency. poll_freq < log_freq
     poll_freq = 1.
@@ -55,9 +54,10 @@ def poll_ups(nut_server):
     last_log_time = 0
 
     logging.info('Connecting to nut-server at %s', nut_server)
+    logging.info('Writing output to %s', log_file)
 
     nut = PyNUT.PyNUTClient(host=nut_server, login=nut_login, password=nut_password)
-    ofile = open(logfile, "ab+")
+    ofile = open(log_file, "ab+")
 
     writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
     while 1:
@@ -91,9 +91,10 @@ def usage():
 def main(argv):
 
     nut_server = '127.0.0.1'
+    log_file = '/var/log/power.csv'
 
     try:
-        opts, args = getopt.getopt(argv, 'h:u:p', ['host=', 'user=', 'password='])
+        opts, args = getopt.getopt(argv, 'h:u:p:l:', ['host=', 'user=', 'password=', 'logfile='])
     except getopt.GetoptError:
         usage()
         sys.exit(2)
@@ -101,6 +102,8 @@ def main(argv):
     for opt, arg in opts:
         if opt in ('-h', '-host'):
             nut_server = arg
+        elif opt in ('-l', '-logfile'):
+            log_file = arg
         else:
             usage()
             sys.exit(2)
@@ -109,7 +112,7 @@ def main(argv):
 
     logging.info('Starting polling thread')
 
-    d = threading.Thread(target=poll_ups, args=(nut_server,))
+    d = threading.Thread(target=poll_ups, args=(nut_server, log_file,))
     d.setDaemon(True)
     d.start()
 
