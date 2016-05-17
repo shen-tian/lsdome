@@ -12,3 +12,10 @@ bin*
 
 # Compiled Python code
 *.pyc
+
+# Logs
+*.log
+*.csv
+
+# Jetbrain stuff
+*.idea*

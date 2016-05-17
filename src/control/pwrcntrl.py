@@ -14,6 +14,7 @@ import json
 import PyNUT
 import csv
 import sys
+import getopt
 
 logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -42,9 +43,15 @@ class EchoRequestHandler(SocketServer.BaseRequestHandler):
             return
 
 
-def pollUps(logfile='/var/log/powerlog.csv'):
-    # Hardcoded for now.
-    nut = PyNUT.PyNUTClient(host="127.0.0.1", login="monuser", password="password")
+def poll_ups(nut_server):
+    nut_login = "monuser"
+    nut_password = "password"
+
+    logfile = 'powerlog.csv'
+
+    logging.info('Connecting to nut-server at %s', nut_server)
+
+    nut = PyNUT.PyNUTClient(host=nut_server, login=nut_login, password=nut_password)
     ofile = open(logfile, "ab+")
 
     writer = csv.writer(ofile, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -61,30 +68,47 @@ def pollUps(logfile='/var/log/powerlog.csv'):
             upsData[param] = result[param]
             output_list.append(result[param])
         writer.writerow(output_list)
-        time.sleep(1.)
+        time.sleep(30.)
+    return
+
+
+def usage():
+    print 'oops'
     return
 
 
 def main(argv):
-    logfile = argv[0]
 
-    d = threading.Thread(target=pollUps, args=(logfile,))
+    nut_server = '127.0.0.1'
+
+    try:
+        opts, args = getopt.getopt(argv, 'h:u:p', ['host=', 'user=', 'pass='])
+    except getopt.GetoptError:
+        usage()
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt in ('-h', '-host'):
+            nut_server = arg
+        else:
+            usage()
+            sys.exit(2)
+
+    logging.info('Starting power controller.')
+
+    logging.info('Starting polling thread')
+
+    d = threading.Thread(target=poll_ups, args=(nut_server,))
     d.setDaemon(True)
     d.start()
 
-    logging.info('Started polling thread')
+    logging.info('Starting server')
 
     address = ('0.0.0.0', 5204)
     server = SocketServer.TCPServer(address, EchoRequestHandler)
 
-    d2 = threading.Thread(target=server.serve_forever)
-    d2.setDaemon(True)
-    d2.start()
-
-    logging.info("Both threads started. Press enter")
-
-    while 1:
-        time.sleep(5)
+    server.serve_forever()
+    return
 
 
 if __name__ == '__main__':
