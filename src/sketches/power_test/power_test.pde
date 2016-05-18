@@ -20,7 +20,7 @@ void setup() {
   dot = loadImage("color-dot.png");
 
   // Connect to the local instance of fcserver
-  opc = new OPC(this, "192.168.1.125", 7890);
+  opc = new OPC(this, "192.168.1.105", 7890);
 
   // Map one 64-LED strip to the center of the window
   opc.ledGrid(0,25,2, width/2, height/2, width / 30., width / 30. ,0, true);
