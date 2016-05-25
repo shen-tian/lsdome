@@ -55,7 +55,6 @@ charge = True
 while True:
     t = time.time() - start_time
     pixels = get_rainbow_pulse(t)
-
     pixels2 = get_charge_light(t)
 
     for j in range(numLEDs):

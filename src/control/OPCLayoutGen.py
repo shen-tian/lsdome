@@ -39,10 +39,15 @@ def main(argv):
 
     leds = list()
 
-    leds.extend(get_line(0, -8./38., 19, 1/19., 0))
-    leds.extend(get_line(.5, 0, 8, 1/19., math.pi/2))
-    leds.extend(get_line(0, 8./38., 19, 1/19., math.pi))
-    leds.extend(get_line(-.5, 0, 8, 1/19., 3 * math.pi/2))
+    m = 8
+    n = 19
+
+    pitch = 1. / n
+
+    leds.extend(get_line(0, -m * .5 * pitch, n, pitch, 0))
+    leds.extend(get_line(n * .5 * pitch, 0, m, pith, math.pi/2))
+    leds.extend(get_line(0, m * .5 * pitch, n, pitch, math.pi))
+    leds.extend(get_line(-n * .5 * pitch, 0, m, pitch, 3 * math.pi/2))
 
     with open(fname, 'w') as outfile:
         json.dump(leds, outfile, sort_keys=True, indent=4)
