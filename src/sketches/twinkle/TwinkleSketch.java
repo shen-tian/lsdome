@@ -1,3 +1,5 @@
+import me.lsdo.processing.*;
+
 import java.util.*;
 import processing.core.*;
 
@@ -33,7 +35,7 @@ public class TwinkleSketch extends PixelGridSketch<Object> {
         super(app, size_px);
     }
 
-    void init() {
+    public void init() {
         super.init();
 
         brightness = new HashMap<DomeCoord, Double>();
@@ -44,7 +46,7 @@ public class TwinkleSketch extends PixelGridSketch<Object> {
         }
     }
 
-    int drawPixel(DomeCoord c, double t) {
+    protected int drawPixel(DomeCoord c, double t) {
         double b = brightness.get(c);
         for (int i = 0; i < SIMULATED_SPEEDUP; i++) {
             double rand = 2*(Math.random() - .5);

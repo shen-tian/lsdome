@@ -1,5 +1,7 @@
 // Twinkling stars.
 
+import me.lsdo.processing.*;
+
 FadecandySketch driver = new TwinkleSketch(this, 300);
 
 void setup() {

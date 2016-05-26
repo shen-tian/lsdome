@@ -1,5 +1,7 @@
 import java.io.*;
 import processing.core.*;
+import me.lsdo.processing.*;
+
 
 public class TubeSketch extends PointSampleSketch<PVector, Double> {
 
@@ -40,15 +42,15 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
         return LayoutUtil.V(polar.y, 1. / Math.tan(Math.toRadians(.5*fov)) / polar.x);
     }
 
-    Double initialState() {
+    protected Double initialState() {
         return 0.;
     }
 
-    Double updateState(Double pos, double delta_t) {
+    protected Double updateState(Double pos, double delta_t) {
         return pos + speed * delta_t;
     }
 
-    int samplePoint(PVector uv, double t, double t_jitter) {
+    protected int samplePoint(PVector uv, double t, double t_jitter) {
         double pos0 = state;
         double pos = pos0 + speed * t_jitter;
 
@@ -60,7 +62,7 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
         return color(MathUtil.fmod(u_pct + dist/10., 1.), .5, chk ? 1 : .05);
     }
 
-    void beforeFrame(double t) {
+    protected void beforeFrame(double t) {
         if (input != null) {
             try {
                 while (input.ready()) {

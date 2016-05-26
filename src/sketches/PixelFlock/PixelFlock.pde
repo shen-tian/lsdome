@@ -1,3 +1,5 @@
+import me.lsdo.processing.*;
+
 import ddf.minim.analysis.*;
 import ddf.minim.*;
 

@@ -1,3 +1,4 @@
+import me.lsdo.processing.*;
 import java.util.*;
 import processing.core.*;
 
@@ -11,7 +12,7 @@ public class PixelTest extends PixelGridSketch<Object> {
         super(app, size_px);
     }
 
-    void init() {
+    public void init() {
         super.init();
 
         coordOrder = new HashMap<DomeCoord, Integer>();
