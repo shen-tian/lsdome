@@ -1,7 +1,8 @@
 import java.util.*;
 import processing.core.*;
+import me.lsdo.processing.*;
 
-public class TwinkleSketch extends PixelGridSketch<Object> {
+public class TwinkleSketch extends DomeAnimation{
 
     // Skew of initial brightness of stars. Higher means fewer bright stars.
     // >= 1.
@@ -26,25 +27,20 @@ public class TwinkleSketch extends PixelGridSketch<Object> {
     // Perform this many twinkling iterations per frame.
     final int SIMULATED_SPEEDUP = 1;
 
-    HashMap<DomeCoord, Double> brightness;
-    HashMap<DomeCoord, Double> saturation;
+    private HashMap<DomeCoord, Double> brightness;
+    private HashMap<DomeCoord, Double> saturation;
 
-    public TwinkleSketch(PApplet app, int size_px) {
-        super(app, size_px);
-    }
-
-    void init() {
-        super.init();
-
+    public TwinkleSketch(Dome dome, OPC opc) {
+        super(dome, opc);
         brightness = new HashMap<DomeCoord, Double>();
         saturation = new HashMap<DomeCoord, Double>();
-        for (DomeCoord c : coords) {
+        for (DomeCoord c : dome.coords) {
             brightness.put(c, Math.pow(Math.random(), POWER_LAW));
             saturation.put(c, Math.random());
         }
     }
 
-    int drawPixel(DomeCoord c, double t) {
+    public int drawPixel(DomeCoord c, double t) {
         double b = brightness.get(c);
         for (int i = 0; i < SIMULATED_SPEEDUP; i++) {
             double rand = 2*(Math.random() - .5);
@@ -55,13 +51,14 @@ public class TwinkleSketch extends PixelGridSketch<Object> {
             // will gradually get dimmer. This is a good analogue for the heat death of the universe.
             b = Math.min(b, 1.);
         }
-        brightness.put(c, b); 
+        brightness.put(c, b);
 
         double sat = saturation.get(c);
         double maxsat = MAX_SAT_FULL_BRIGHTNESS + (1 - MAX_SAT_FULL_BRIGHTNESS) * Math.pow(1 - b, SAT_V_BRIGHTNESS_POWER_LAW);
         sat *= maxsat;
 
-        return color(HUE, sat, b);
+        return getHsbColor((int)(HUE * 255), (int)(sat * 255), (int)(b * 255));
     }
 
 }
+
