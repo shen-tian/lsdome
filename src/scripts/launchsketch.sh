@@ -12,7 +12,4 @@ SRC_DIR=$(cd $(dirname $0)/.. && pwd -P)  # src/ directory of lsdome repo
 SKETCH_DIR=$SRC_DIR/sketches/$SKETCH_NAME
 SKETCH_LIB_DIR=$SKETCH_DIR/code
 
-JARFILE=$($SRC_DIR/scripts/buildlib.sh $PROCESSING_DIR)
-mkdir -p $SKETCH_LIB_DIR
-cp $JARFILE $SKETCH_LIB_DIR/lsdomeLib.jar
 $PROCESSING_DIR/processing-java --sketch=$SKETCH_DIR --run --output=$(mktemp -d) --force
