@@ -16,5 +16,5 @@ targetCompatibility = 1.6
 
 jar {
     baseName = 'lsdome'
-    version =  '0.1.0'
+    version =  '1.0.0'
 }
