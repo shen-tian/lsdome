@@ -1,5 +1,7 @@
 # Limitless Slip Dome
 
+[![Build Status](https://travis-ci.org/shen-tian/lsdome.svg?branch=master)](https://travis-ci.org/shen-tian/lsdome)
+
 Project for Afrika Burn 2016. A dome style gazebo with around 1500 - 2800
 WS2812B LEDs, controlled via [Fadecandies](http://www.misc.name/fadecandy/).
 See the [project](http://lsdo.me) page.

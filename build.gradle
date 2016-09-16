@@ -1,4 +1,7 @@
 apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = "me.lsdo.Driver"
 
 // need the core Processing library to build.
 repositories {
@@ -14,11 +17,13 @@ dependencies {
 sourceCompatibility = 1.6
 targetCompatibility = 1.6
 
+//compileJava.options.bootClasspath = "$JDK6_HOME/jre/lib/rt.jar"
+
 jar {
     baseName = 'lsdome'
     version =  '1.0.0'
 }
 
 task wrapper(type: Wrapper) {
-    gradleVersion = '2.13'
+    gradleVersion = '3.0'
 }
