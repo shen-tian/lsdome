@@ -1,3 +1,5 @@
+import me.lsdo.processing.*;
+
 float[][] ndata;
 float[][] odata;
 final float eps = 1;
@@ -6,10 +8,12 @@ PVector light;
 PImage image;
 boolean rain;
 
-FadecandySketch driver = new FadecandySketch(this, 250, 250);
+SimplestSketch simple;
 
 void setup()
 {
+    size(300, 300);
+    simple = new SimplestSketch(this, new Dome(6), new OPC());
   image = loadImage("img.jpg");
   colorMode(HSB, 100);
   ndata = new float[width][height];
@@ -17,7 +21,6 @@ void setup()
   light = new PVector(1, 1, 0);
   light.normalize();
   rain = true;
-  driver.init();
   
 }
 
@@ -57,6 +60,8 @@ void draw()
   }
 
   updatePixels();
+  
+  simple.draw();
 }
 
 void ripple()

@@ -3,14 +3,20 @@
  * This is a prototype for direct pixel-based rendering. The screen itself is not rendered-- the pixel coordinates
  * are evaluated directly (with antialiasing support) and written to the screen solely for visualization.
  */
+import me.lsdo.processing.*;
 
-TubeSketch driver = new TubeSketch(this, 300);
+PixelGridSketch sketch;
 
 void setup() {
-  driver.init();
+    size(300, 300);
+    Dome dome = new Dome(6);
+    OPC opc = new OPC();
+    DomeAnimation animation = new TubeSketch(dome, opc);
+    sketch = new PixelGridSketch(this, animation);
 }
 
 void draw() {
-  driver.draw();
+    sketch.draw();
 }
+
 

@@ -4,15 +4,16 @@
 
 
 import gifAnimation.*;    // import the gifAnimation library
+import me.lsdo.processing.*;
 
 Gif myAnimation;          // create Gif object called myAnimation
-FadecandySketch driver = new FadecandySketch(this, FadecandySketch.widthForPixelDensity(1.));
+SimplestSketch simple;
 
 void setup() {
 
-  colorMode(HSB, 100);
-  driver.init();
-
+    size(300, 300);
+    simple = new SimplestSketch(this, new Dome(6), new OPC());
+    colorMode(HSB, 100);
   myAnimation = new Gif(this, "130309.gif");
 
   myAnimation.play();                       // play the animated GIF

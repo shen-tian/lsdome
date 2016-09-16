@@ -1,29 +1,25 @@
+import me.lsdo.processing.*;
 import java.util.*;
 import processing.core.*;
 
-public class PixelTest extends PixelGridSketch<Object> {
+public class PixelTestAnimation extends DomeAnimation {
 
     HashMap<DomeCoord, Integer> coordOrder;
     int[] arms;
     int px_per_panel;
 
-    public PixelTest(PApplet app, int size_px) {
-        super(app, size_px);
-    }
-
-    void init() {
-        super.init();
-
+    public PixelTestAnimation(Dome dome, OPC opc) {
+        super(dome, opc);
         coordOrder = new HashMap<DomeCoord, Integer>();
-        for (int i = 0; i < coords.size(); i++) {
-            coordOrder.put(coords.get(i), i);
+        for (int i = 0; i < dome.coords.size(); i++) {
+            coordOrder.put(dome.coords.get(i), i);
         }
 
-        arms = LayoutUtil.getPanelConfig(panel_config_mode).arms;
-        px_per_panel = LayoutUtil.pixelsPerPanel(panel_size);
+        arms = new int[] {4, 4, 4, 1};
+        px_per_panel = LayoutUtil.pixelsPerPanel(15);
     }
 
-    int drawPixel(DomeCoord c, double t) {
+    protected int drawPixel(DomeCoord c, double t) {
         float creep_speed = 20;
         float ramp_length = 100;
 
@@ -45,7 +41,10 @@ public class PixelTest extends PixelGridSketch<Object> {
 
         double min_sat = .5;
         double max_sat = 1.;
-        return color(arm / (double)arms.length, min_sat*(1-k_panel) + max_sat*k_panel, MathUtil.fmod(k_px, 1.));
+        return getHsbColor(
+        (int)(255 * arm / (double)arms.length), 
+        (int)(255 * (min_sat*(1-k_panel) + max_sat*k_panel)), 
+        (int)(255* MathUtil.fmod(k_px, 1.)));
     }
 
 }

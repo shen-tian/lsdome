@@ -1,7 +1,8 @@
 import java.io.*;
 import processing.core.*;
+import me.lsdo.processing.*;
 
-public class TubeSketch extends PointSampleSketch<PVector, Double> {
+public class TubeSketch extends XYAnimation {
 
     static final double DEFAULT_FOV = 120.;
     static final int DEFAULT_SUBSAMPLING = 4;
@@ -11,22 +12,17 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
 
     double speed = 1.;
 
-    TubeSketch(PApplet app, double fov, int size_px, int subsampling, boolean temporal_jitter) {
-        super(app, size_px, subsampling, temporal_jitter);
+    TubeSketch(Dome dome, OPC opc, double fov) {
+        super(dome, opc);
         this.fov = fov;
-        input = app.createReader("/tmp/pipe");
+        
+        // Hook this up later
+        //input = app.createReader("/tmp/pipe");
     }
 
-    TubeSketch(PApplet app, int size_px, double fov) {
-        this(app, fov, size_px, DEFAULT_SUBSAMPLING, true);
-    }
 
-    TubeSketch(PApplet app, int size_px, int subsampling, boolean temporal_jitter) {
-        this(app, DEFAULT_FOV, size_px, subsampling, temporal_jitter);
-    }
-
-    TubeSketch(PApplet app, int size_px) {
-        this(app, size_px, DEFAULT_FOV);
+    TubeSketch(Dome dome, OPC opc) {
+        this(dome, opc, DEFAULT_FOV);
     }
 
     double subsamplingBoost(PVector p) {
@@ -40,26 +36,22 @@ public class TubeSketch extends PointSampleSketch<PVector, Double> {
         return LayoutUtil.V(polar.y, 1. / Math.tan(Math.toRadians(.5*fov)) / polar.x);
     }
 
-    Double initialState() {
-        return 0.;
-    }
 
-    Double updateState(Double pos, double delta_t) {
-        return pos + speed * delta_t;
-    }
-
-    int samplePoint(PVector uv, double t, double t_jitter) {
-        double pos0 = state;
-        double pos = pos0 + speed * t_jitter;
-
+    protected int samplePoint(PVector uv, double t, double t_jitter) {
+        double pos = t * speed;
+        
         double u_pct = MathUtil.fmod(uv.x / (2*Math.PI), 1.);
         double dist = uv.y + pos;
         //boolean chk = ((int)MathUtil.fmod((uv.x + dist)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((uv.x - dist)/(.25*Math.PI), 2.)) % 2 == 0;
         boolean chk = ((int)MathUtil.fmod((uv.x)/(.25*Math.PI), 2.) + (int)MathUtil.fmod((dist)/(.25*Math.PI), 2.)) % 2 == 0;
         //boolean chk = (MathUtil.fmod((uv.x + dist) / Math.PI, 2.) < 1.);
-        return color(MathUtil.fmod(u_pct + dist/10., 1.), .5, chk ? 1 : .05);
+        return OpcColor.getHsbColor(
+            (float)MathUtil.fmod(u_pct + dist/10., 1.),
+            .5f,
+            chk ? 1.f : .05f);
     }
 
+    // This is not hooked up at the moment. 
     void beforeFrame(double t) {
         if (input != null) {
             try {

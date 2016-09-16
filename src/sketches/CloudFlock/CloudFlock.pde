@@ -1,5 +1,6 @@
 import ddf.minim.analysis.*;
 import ddf.minim.*;
+import me.lsdo.processing.*;
 
 Minim minim;
 AudioInput in;
@@ -10,7 +11,7 @@ float minBrightness = 50;
 float brightnessScale = 300;
 BeatDetect beat;
 
-FadecandySketch driver = new FadecandySketch(this, 250, 250);
+SimplestSketch simple;
 Flock flock;
 static final int START_HUE = 60;
 static final int COLOUR_RANGE = 10; //hue can be current +- this
@@ -24,6 +25,8 @@ int hueWait = 5000;
 float xstart, xnoise, ystart, ynoise;   
 
 void setup() {
+    size(250, 250);
+    simple = new SimplestSketch(this, new Dome(6), new OPC());
   minim = new Minim(this);
   in = minim.getLineIn();
   fft = new FFT(in.bufferSize(), in.sampleRate());
@@ -32,7 +35,6 @@ void setup() {
   beat = new BeatDetect();
 
   colorMode(HSB, 100);
-  driver.init();
   hueTime = millis();
   flockTime = millis();
 
@@ -92,7 +94,7 @@ void draw() {
     }
     
   
-    driver.draw();
+    simple.draw();
 }
 
 void cycleHue() {

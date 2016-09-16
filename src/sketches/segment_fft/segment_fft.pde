@@ -29,7 +29,7 @@ void setup()
     size(300, 300, P3D);
 
     Dome dome = new Dome(6);
-    OPC opc = new OPC("127.0.0.1", 7890);
+    OPC opc = new OPC();
     simple = new SimplestSketch(this, dome, opc);
 
     minim = new Minim(this); 

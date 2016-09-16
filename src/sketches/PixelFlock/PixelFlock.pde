@@ -22,9 +22,8 @@ SimplestSketch simple;
 void setup() {
     size(300, 300);
 
-    Dome dome = new Dome(6);
-    OPC opc = new OPC();
-    simple = new SimplestSketch(this, dome, opc);
+    simple = new SimplestSketch(this, new Dome(6), new OPC());
+    
     minim = new Minim(this);
     in = minim.getLineIn();
     fft = new FFT(in.bufferSize(), in.sampleRate());

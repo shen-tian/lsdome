@@ -5,12 +5,18 @@
  * individual pixels progress in a marching ants pattern.
  */
 
-FadecandySketch driver = new PixelTest(this, 300);
+import me.lsdo.processing.*;
+
+PixelGridSketch sketch;
 
 void setup() {
-  driver.init();
+    size(450, 450);
+    Dome dome = new Dome(6);
+    OPC opc = new OPC();
+    DomeAnimation animation = new PixelTestAnimation(dome, opc);
+    sketch = new PixelGridSketch(this, animation);
 }
 
 void draw() {
-  driver.draw();
+    sketch.draw();
 }

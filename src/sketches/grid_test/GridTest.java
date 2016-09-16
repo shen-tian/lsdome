@@ -1,13 +1,14 @@
 import java.util.*;
 import processing.core.*;
+import me.lsdo.processing.*;
 
-public class GridTest extends PixelGridSketch<Object> {
+public class GridTest extends DomeAnimation {
 
-    public GridTest(PApplet app, int size_px) {
-        super(app, size_px);
+    public GridTest(Dome dome, OPC opc) {
+        super(dome, opc);
     }
 
-    int drawPixel(DomeCoord c, double t) {
+    public int drawPixel(DomeCoord c, double t) {
         double demoPeriod = 4;
         int mode = (int)Math.floor(t / demoPeriod);
         int axisMode = mode % 3;

@@ -19,3 +19,7 @@ bin*
 
 # Jetbrain stuff
 *.idea*
+
+# Gradle
+.gradle*
+build*
