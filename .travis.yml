@@ -1,4 +1,1 @@
-language: python
-python:
-  - "2.7"
-script: python src/control/pwrcntrl_test.py
+language: java
