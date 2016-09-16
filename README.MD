@@ -17,7 +17,33 @@ on a frame 2m off of the ground. Since the LEDs are fully addressable
 really well with sound too, so I'd like to add some speakers (not a dance party
 level. More like ambient++). Its footprint should be around 5x5m.
 
-### Install
+### Build
+
+Work in progress: the project is split between two parts right now: 
+
+* Headless animations that can run without an X environment
+* Processing sketches that need a graphics environment to run.
+
+The headless code is organised as a Java app. It's built by `gradle`.
+`gradle installDist` places it in the `\build\install\lsdome` folder.
+Running the `./bin/lsdome` script launches it. It accepts these parameters:
+
+    lsdome [cloud|rings|kaleidoscope|twinkle|pixeltest
+    
+It's pretty self contained. Since these are headless, you do need an 
+OPC server that's connected to see what's going on though.
+
+The sketches are a bit different. The source sits in the `src/sketches` folder.
+To run them: 
+
+1. Install [lsdome-processing](https://github.com/shen-tian/lsdome-processing)
+into your processing libraries folder.
+2. Open the relevant sketch in Processing 2.
+3. Build, run. Blah. 
+
+The legacy instructions below probably also works.
+
+### Install (Legacy)
 
 1. Download Processing 2 (As of time of writing, this should be 2.2.1). Unpack
 this into a folder (`~\processing-2.2.1`) for rest of the document.

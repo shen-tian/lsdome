@@ -1,8 +1,9 @@
+package me.lsdo.ab16;
+
 import java.util.*;
-import processing.core.*;
 import me.lsdo.processing.*;
 
-public class TwinkleSketch extends DomeAnimation{
+public class Twinkle extends DomeAnimation{
 
     // Skew of initial brightness of stars. Higher means fewer bright stars.
     // >= 1.
@@ -22,7 +23,7 @@ public class TwinkleSketch extends DomeAnimation{
     // >= 0.
     final double SAT_V_BRIGHTNESS_POWER_LAW = 2;
 
-    final double HUE = .66;  // deep blue
+    final double HUE = 0.6666;  // deep blue
 
     // Perform this many twinkling iterations per frame.
     final int SIMULATED_SPEEDUP = 1;
@@ -30,7 +31,7 @@ public class TwinkleSketch extends DomeAnimation{
     private HashMap<DomeCoord, Double> brightness;
     private HashMap<DomeCoord, Double> saturation;
 
-    public TwinkleSketch(Dome dome, OPC opc) {
+    public Twinkle(Dome dome, OPC opc) {
         super(dome, opc);
         brightness = new HashMap<DomeCoord, Double>();
         saturation = new HashMap<DomeCoord, Double>();
@@ -57,7 +58,7 @@ public class TwinkleSketch extends DomeAnimation{
         double maxsat = MAX_SAT_FULL_BRIGHTNESS + (1 - MAX_SAT_FULL_BRIGHTNESS) * Math.pow(1 - b, SAT_V_BRIGHTNESS_POWER_LAW);
         sat *= maxsat;
 
-        return OpcColor.getHsbColor(HUE, sat, b);
+        return OpcColor.getHsbColor(.66f, sat, b);
     }
 
 }
