@@ -1,5 +1,9 @@
-import java.util.*;
-import processing.core.*;
+package me.lsdo.ab16;
+
+/*
+ * Demo the properties of the triangular pixel grid.
+ */
+
 import me.lsdo.processing.*;
 
 public class GridTest extends DomeAnimation {
@@ -19,17 +23,25 @@ public class GridTest extends DomeAnimation {
         int k = (int)Math.floor(t / marchPeriod) % marchCycle;
         double sat = .75;
 
-        TriCoord coord = c.getCoord(new CoordType[] {CoordType.UNIVERSAL, CoordType.PANEL, CoordType.PIXEL}[typeMode]);
+        TriCoord coord = c.getCoord(new TriCoord.CoordType[] {
+                TriCoord.CoordType.UNIVERSAL,
+                TriCoord.CoordType.PANEL,
+                TriCoord.CoordType.PIXEL}[typeMode]);
         int val = coord.getAxis(TriCoord.axes[axisMode]);
         if (typeMode == 2) {
-            if (coord.getOrientation() == PanelOrientation.B) {
+            if (coord.getOrientation() == TriCoord.PanelOrientation.B) {
                 val = coord.panel_length - 1 - val;
                 sat = .5;
             } else {
                 sat = .9;
             }
         }
-        return color(axisMode / 3., sat, MathUtil.mod(val, marchCycle) == k ? 1 : 0);
+
+        return OpcColor.getHsbColor(
+                axisMode / 3.,
+                sat,
+                MathUtil.mod(val, marchCycle) == k ? 1 : 0);
+
     }
 
 }

@@ -5,7 +5,6 @@ package me.lsdo.ab16;
  * https://github.com/scanlime/fadecandy/tree/master/examples/processing/grid24x8z_clouds
  */
 
-import processing.core.*;
 import me.lsdo.processing.*;
 
 public class Cloud extends XYAnimation {

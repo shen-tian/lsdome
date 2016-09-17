@@ -1,5 +1,12 @@
 package me.lsdo.ab16;
 
+/*
+ * A sketch to help debug the proper placement of panels.
+ *
+ * Each fadecandy 'arm' is a different color; each panel is slightly more saturated than the previous, and the
+ * individual pixels progress in a marching ants pattern.
+ */
+
 import me.lsdo.processing.*;
 import java.util.*;
 

@@ -37,6 +37,9 @@ public class Driver
             } else if (args[0].equals("pixeltest")) {
                 System.out.println("Starting pixeltest");
                 animation = new PixelTest(dome, opc);
+            } else if (args[0].equals("gridtest")) {
+                System.out.println("Starting gridtest");
+                animation = new GridTest(dome, opc);
             } else
                 animation = new Rings(dome, opc);
         } else
