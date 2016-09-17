@@ -1,10 +1,16 @@
-// The Flock (a list of Boid objects)
 
-class Flock {
+
+/**
+ * Created by shen on 2016/09/17.
+ */
+
+import java.util.ArrayList;
+
+public class BoidFlock {
     ArrayList<Boid> boids; // An ArrayList for all the boids
     int currentHue = 60;
 
-    Flock() {
+    BoidFlock() {
         boids = new ArrayList<Boid>(); // Initialize the ArrayList
     }
 
@@ -33,18 +39,18 @@ class Flock {
 
     void scatterFlock() {
         for (Boid b : boids) {
-            b.sepWeight = 10.0;
-            b.aliWeight= 0.0;
-            b.cohWeight = 0.0;
+            b.sepWeight = 10.0f;
+            b.aliWeight= 0.0f;
+            b.cohWeight = 0.0f;
             b.maxspeed = 2 * Boid.MAX_SPEED;
         }
     }
 
     void collectFlock() {
         for (Boid b : boids) {
-            b.sepWeight = 1.5;
-            b.aliWeight= 1.0;
-            b.cohWeight = 1.0;
+            b.sepWeight = 1.5f;
+            b.aliWeight= 1.0f;
+            b.cohWeight = 1.0f;
             b.maxspeed = Boid.MAX_SPEED;
         }
     }
@@ -53,4 +59,3 @@ class Flock {
         boids.add(b);
     }
 }
-

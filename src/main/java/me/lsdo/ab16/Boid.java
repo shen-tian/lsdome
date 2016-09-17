@@ -1,4 +1,16 @@
-// The Boid class
+package me.lsdo.ab16;
+
+/**
+ * Created by shen on 2016/09/17.
+ *
+ * Java-ising code Mel used.
+ */
+
+import processing.core.*;
+import java.util.ArrayList;
+import java.util.Random;
+
+public // The Boid class
 
 class Boid {
 
@@ -10,38 +22,53 @@ class Boid {
     float maxspeed;    // Maximum speed
     int currentHue;
 
-    int sat = 90 + (COLOUR_RANGE - (int)random(COLOUR_RANGE*2));
+    int sat;
     int light = 75;
-    int hueOffset = (COLOUR_RANGE - (int)random(COLOUR_RANGE*2));
+    int hueOffset;
 
-    float sepWeight = 1.5;
-    float aliWeight = 1.0;
-    float cohWeight = 1.0;
+    int width;
+    int height;
 
-    static final float OFFSCREEN_SPACE = 100; //how much bigger the universe is in each dimension than the viewport
-    static final float BOID_SIZE = 6.0; //how big the boids are
+    float sepWeight = 1.5f;
+    float aliWeight = 1.0f;
+    float cohWeight = 1.0f;
+
+    static final float OFFSCREEN_SPACE = 100f; //how much bigger the universe is in each dimension than the viewport
+    static final float BOID_SIZE = 6.0f; //how big the boids are
     static final int MAX_SPEED = 1; //how fast the boids can move
     static final int COLOUR_RANGE = 10; //hue, saturation and brightness values for visible boids can be current +- this
 
     int[] boidColor;
 
-    Boid(float x, float y, int hue) {
+    private Random random;
+
+    Boid(float x, float y, int hue, int boxWidth, int boxHeight) {
         acceleration = new PVector(0, 0);
         velocity = PVector.random2D();
         location = new PVector(x, y);
 
         r = BOID_SIZE;
         maxspeed = MAX_SPEED;
-        maxforce = 0.03;
+        maxforce = 0.03f;
 
         currentHue = hue;
+
+        random = new Random(0);
+
+        sat = 90 + (COLOUR_RANGE - random.nextInt(COLOUR_RANGE*2));
+        hueOffset = (COLOUR_RANGE - random.nextInt(COLOUR_RANGE*2));
+
+        width = boxWidth;
+        height = boxHeight;
     }
+
+
 
     void run(ArrayList<Boid> boids) {
         flock(boids);
         update();
         borders();
-        render();
+        //render();
     }
 
     void setHue(int hue) {
@@ -106,11 +133,12 @@ class Boid {
     int[] getColour() {
         int hue = currentHue + hueOffset;
         int[] col = new int[] {
-            hue, sat, light, 100
+                hue, sat, light, 100
         };
         return col;
     }
 
+    /**
     void render() {
         // Draw a triangle rotated in the direction of velocity
         float theta = velocity.heading2D() + radians(90);
@@ -128,6 +156,7 @@ class Boid {
         endShape();
         popMatrix();
     }
+     */
 
     // Wraparound
     void borders() {

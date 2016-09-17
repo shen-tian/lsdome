@@ -11,18 +11,18 @@ float minBrightness = 50;
 float brightnessScale = 300;
 BeatDetect beat;
 
-Flock flock;
+BoidFlock flock;
 static final int startHue = 60;
 
 int time;
 int wait = 100;
 
-SimplestSketch simple;
+CanvasSketch simple;
 
 void setup() {
     size(300, 300);
 
-    simple = new SimplestSketch(this, new Dome(6), new OPC());
+    simple = new CanvasSketch(this, new Dome(6), new OPC());
     
     minim = new Minim(this);
     in = minim.getLineIn();
@@ -33,16 +33,21 @@ void setup() {
 
     colorMode(HSB, 100);
     time = millis();
-    flock = new Flock();
+    flock = new BoidFlock();
     // Add an initial set of boids into the system
     for (int i = 0; i < 75; i++) {
-        flock.addBoid(new Boid(width/2, height/2, startHue));
+        flock.addBoid(new Boid(width/2, height/2, startHue, width, height));
     }
 }
 
 void draw() {
     background(0);
     flock.run();
+    
+    for (Boid b : flock.boids)
+        render(b);
+    
+    
 
     for (int i = 0; i < fftFilter.length; i++) {
         fftFilter[i] = max(fftFilter[i] * decay, log(1 + fft.getBand(i)));
@@ -72,4 +77,26 @@ void draw() {
 
     simple.draw();
 }
+
+    void render(Boid b) {
+        
+        
+        // Dra w a triangle rotated in the direction of velocity
+        float theta = b.velocity.heading2D() + radians(90);
+        // heading2D() above is now heading() but leaving old syntax until Processing.js catches up
+
+        int[] col = b.getColour();
+        fill(col[0], col[1], col[2], col[3]);
+        pushMatrix();
+        translate(b.location.x, b.location.y);
+        rotate(theta);
+        beginShape(TRIANGLES);
+        
+        vertex(0, -b.r*2);
+        vertex(-b.r, b.r*2);
+        vertex(b.r, b.r*2);
+        endShape();
+        popMatrix();
+
+    }
 
