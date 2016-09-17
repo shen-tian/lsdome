@@ -9,8 +9,6 @@ import me.lsdo.processing.*;
 
 public class Cloud extends XYAnimation {
 
-    private int mode;
-
     private double dx;
     private double dy;
     private double dz;
@@ -23,7 +21,6 @@ public class Cloud extends XYAnimation {
 
     public Cloud(Dome dome, OPC opc) {
         super(dome, opc);
-        mode = 0;
 
         dx = dy = dz = 0;
 

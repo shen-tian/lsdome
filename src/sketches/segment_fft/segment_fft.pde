@@ -22,7 +22,7 @@ float minSize = 0.1;
 float sizeScale = 0.2;
 float angleCover = 500;
 
-SimplestSketch simple;
+CanvasSketch simple;
 
 void setup()
 {
@@ -30,7 +30,7 @@ void setup()
 
     Dome dome = new Dome(6);
     OPC opc = new OPC();
-    simple = new SimplestSketch(this, dome, opc);
+    simple = new CanvasSketch(this, dome, opc);
 
     minim = new Minim(this); 
 

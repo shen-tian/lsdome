@@ -33,7 +33,10 @@ public class Driver
                     "cloud",
                     "kaleidoscope",
                     "twinkle",
-                    "pixeltest"};
+                    "pixeltest",
+                    "noire",
+                    "snowflake",
+                    "dontknow"};
             while (true)
             {
                 int dice = random.nextInt(animations.length);
@@ -64,6 +67,15 @@ public class Driver
         } else if (name.equals("gridtest")) {
             System.out.println("Starting gridtest");
             animation = new GridTest(dome, opc);
+        } else if (name.equals("noire")) {
+            System.out.println("Starting noire");
+            animation = new Noire(dome, opc);
+        } else if (name.equals("snowflake")) {
+            System.out.println("Starting snowflake");
+            animation = new Snowflake(dome, opc);
+        } else if (name.equals("dontknow")) {
+            System.out.println("Starting dontknow");
+            animation = new DontKnow(dome, opc);
         } else
             animation = new Rings(dome, opc);
 

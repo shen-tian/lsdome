@@ -1,6 +1,6 @@
-import processing.core.*;
+import me.lsdo.processing.*;
 
-public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
+public class CloudsSketch extends XYAnimation {
 
     int mode;
 
@@ -33,11 +33,8 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     int samplePoint(PVector p, double t, double t_jitter) {
         switch (mode) {
         case 0:
-            return drawCloud(p, t);
         case 1:
-            return drawRing(p, t);
         case 2:
-            return drawDot(p, t);
         case 3:
             return drawIDontEvenKnow(p, t);
         case 4:
@@ -79,83 +76,10 @@ public class CloudsSketch extends PointSampleSketch<PVector, CloudsState> {
     void afterFrame(double t) {
     }
 
-    int drawCloud(PVector p, double t) {
-        // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
-        p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));
-
-        double z = .08 * t;
-        double hue = .1 * t;
-        double scale = .75;
-        
-        double n = fractalNoise(state.dx + p.x*scale, state.dy + p.y*scale, z) - 0.75;
-        double m = fractalNoise(state.dx + p.x*scale, state.dy + p.y*scale, z + 10.0) - 0.75;
-                    
-        return color(
-                     MathUtil.fmod(hue + .8 * m, 1.), 
-                     1. - constrain(Math.pow(3.0 * n, 3.5), 0, 0.9), 
-                     constrain(Math.pow(3.0 * n, 1.5), 0, 0.9)
-                     );
-    }
-
-    int drawRing(PVector p, double t) {
-        // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
-        p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));
-
-        double z = .08 * t;
-        double hue = .1 * t;
-        double scale = .75;
-        
-        double saturation = constrain(Math.pow(1.15 * noise(t * 0.122), 2.5), 0, 1);
-        double spacing = noise(t * 0.124) * 15.;
-        
-        double centerx = noise(t *  0.125) * 2.5;
-        double centery = noise(t * -0.125) * 2.5;
-        
-        double dist = Math.sqrt(Math.pow(p.x - centerx, 2) + Math.pow(p.y - centery, 2));
-        double pulse = (Math.sin(state.dz + dist * spacing) - 0.3) * 0.3;
-                    
-        double n = fractalNoise(state.dx + p.x*scale + pulse, state.dy + p.y*scale, z) - 0.75;
-        double m = fractalNoise(state.dx + p.x*scale, state.dy + p.y*scale, z + 10.0) - 0.75;
-                    
-        return color(
-                     MathUtil.fmod(hue + .4 * m, 1.), 
-                     saturation,
-                     constrain(Math.pow(3.0 * n, 1.5), 0, 0.9)
-                     );
-    }
-
     // Return a value from 1 to 0 and back gain as x moves from 0 to 'period'
     double cyclicValue(double x, double period) {
         return .5*(Math.cos(x / period * 2*Math.PI) + 1.);
     }
-
-    int drawDot(PVector p, double t) {
-        boolean track_mouse = true;  
-        double minRadius = .2;
-        double maxRadius = .5;
-        double pulsePeriod = 1.5;  //s
-        double radialPeriod = 20;  //s
-        // Make this relatively prime with radialPeriod to ensure the dot doesn't fall into well-worn tracks.
-        double rotPeriod = 7.3854;  //s
-        double hue = 0.;
-        double sat = 0.;
-
-        double radius = minRadius + (maxRadius - minRadius) * cyclicValue(t, pulsePeriod);
-        PVector center;
-        if (track_mouse) {
-            center = normalizePoint(screenToXy(LayoutUtil.V(app.mouseX, app.mouseY)));
-        }
-        else
-        {
-            center = LayoutUtil.Vrot(LayoutUtil.V(cyclicValue(t, radialPeriod), 0), t/rotPeriod * 2*Math.PI);
-        }
-        
-        double dist = LayoutUtil.Vsub(p, center).mag();
-        double k = (dist > radius ? 0. : cyclicValue(dist, 2*radius));
-
-        return color(hue, sat, k);
-    }
-
 
     // Return a value from 1 to 0 and back gain as x moves from 0 to 'period'
     double moireCyclicValue(double x, double period) {
