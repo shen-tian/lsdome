@@ -15,7 +15,7 @@ dependencies {
     //compile "org.jogamp.jogl:jogl-all-main:2.1.5"
     compile "junit:junit:3.8.2"
     compile "ddf.minim:ddf.minim:2.2.0"
-    compile "me.lsdo.processing:lsdome-processing:0.9.1"
+    compile "me.lsdo.processing:lsdome-processing:0.9.2"
 }
 
 sourceCompatibility = 1.6
