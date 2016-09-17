@@ -10,11 +10,11 @@ public class Driver
     public static final int FPS_CAP = 30;
 
     public static void main(String[] args){
+        if (args.length > 0 && args[0].equals("pixelflock"))
+            PixelFlock.main(new String[]{"me.lsdo.ab16.PixelFlock"});
+        else
+            headless(args);
         //ParticleFFT.main(new String[]{"me.lsdo.ab16.ParticleFFT"});
-
-        headless(args);
-
-
     }
 
     public static void headless(String[] args) {
