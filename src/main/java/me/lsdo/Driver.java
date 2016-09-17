@@ -7,6 +7,8 @@ import java.util.Random;
 
 public class Driver
 {
+    public static final int FPS_CAP = 30;
+
     public static void main(String[] args){
         //ParticleFFT.main(new String[]{"me.lsdo.ab16.ParticleFFT"});
 
@@ -76,6 +78,12 @@ public class Driver
         {
             t = (System.currentTimeMillis() - start) / 1000d;
             animation.draw(t);
+            double s = (System.currentTimeMillis() - start) / 1000d;
+            int ms = (int)((s - t) * 1000);
+            try {
+                Thread.sleep(Math.max((int)(1000./FPS_CAP) - ms, 0));
+            } catch (InterruptedException ie) {
+            }
         }
     }
 }
