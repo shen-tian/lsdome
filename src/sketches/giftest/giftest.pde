@@ -7,12 +7,12 @@ import gifAnimation.*;    // import the gifAnimation library
 import me.lsdo.processing.*;
 
 Gif myAnimation;          // create Gif object called myAnimation
-SimplestSketch simple;
+CanvasSketch simple;
 
 void setup() {
 
     size(300, 300);
-    simple = new SimplestSketch(this, new Dome(6), new OPC());
+    simple = new CanvasSketch(this, new Dome(6), new OPC());
     colorMode(HSB, 100);
   myAnimation = new Gif(this, "130309.gif");
 
@@ -23,5 +23,7 @@ void setup() {
 void draw() {
   imageMode(CENTER);
   image(myAnimation, 125,125);
+  
+  simple.draw();
 }
 
