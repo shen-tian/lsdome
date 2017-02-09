@@ -24,14 +24,22 @@ Work in progress: the project is split between two parts right now:
 * Headless animations that can run without an X environment
 * Processing sketches that need a graphics environment to run.
 
+#### Headless java app
+
 The headless code is organised as a Java app. It's built by `gradle`.
 `gradle installDist` places it in the `\build\install\lsdome` folder.
 Running the `./bin/lsdome` script launches it. It accepts these parameters:
 
-    lsdome [cloud|rings|kaleidoscope|twinkle|pixeltest
+    lsdome [cloud|rings|kaleidoscope|twinkle|pixeltest]
     
 It's pretty self contained. Since these are headless, you do need an 
-OPC server that's connected to see what's going on though.
+OPC server that's connected to see what's going on though. Use a `config.properties`
+file to configure where the OPC serer is. Sample file:
+
+    opchostname=192.168.1.123
+    opcport=7890
+
+#### Sketches
 
 The sketches are a bit different. The source sits in the `src/sketches` folder.
 To run them: 
