@@ -82,10 +82,9 @@ And maybe some dependcies. on ubuntu:
 Build the thing:
    
     make
-    
-Then, grab `13panel-gl_server.json` from our lsdome `src/config/` and  put it in `openpixelcontrol/layouts`.
-    
-    bin/gl_server -l /13panel-gl_server.json -p 7890
-    
-to start the simulator.
 
+Then run:
+
+    bin/gl_server -l $LSDOME_REPO_PATH/src/config/simulator_layouts/opcsimulator_layout_24.json -p 7890
+    
+Use the layout file for the corresponding number of panels.
