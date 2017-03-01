@@ -77,8 +77,12 @@ public class Driver
         } else if (name.equals("dontknow")) {
             System.out.println("Starting dontknow");
             animation = new DontKnow(dome, opc);
-        } else
-            animation = new Rings(dome, opc);
+        } else if (name.equals("tube")) {
+            System.out.println("Starting tube");
+            animation = new Tube(dome, opc);
+        } else {
+	    throw new RuntimeException("animation [" + name + "] not recognized");
+	}
 
         RunAnimation(animation, duration);
     }
