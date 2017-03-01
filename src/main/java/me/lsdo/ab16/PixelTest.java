@@ -13,8 +13,9 @@ import java.util.*;
 public class PixelTest extends DomeAnimation {
 
     private HashMap<DomeCoord, Integer> coordOrder;
-    private int[] arms;
+    private static final int ARM_LENGTH = 4;
     private int px_per_panel;
+    private int total_arms;
 
     public PixelTest(Dome dome, OPC opc) {
         super(dome, opc);
@@ -23,8 +24,8 @@ public class PixelTest extends DomeAnimation {
             coordOrder.put(dome.coords.get(i), i);
         }
 
-        arms = new int[] {4, 4, 4, 1};
         px_per_panel = LayoutUtil.pixelsPerPanel(15);
+	total_arms = (int)Math.ceil((double)dome.getNumPoints() / (px_per_panel * ARM_LENGTH));
     }
 
     protected int drawPixel(DomeCoord c, double t) {
@@ -33,24 +34,17 @@ public class PixelTest extends DomeAnimation {
 
         int i = coordOrder.get(c);
         int panel = i / px_per_panel;
-        int arm;
-        int panel0 = 0; // panel that starts the current arm
-        for (arm = 0; arm < arms.length; arm++) {
-            if (panel < arms[arm]) {
-                break;
-            }
-            panel -= arms[arm];
-            panel0 += arms[arm];
-        }
-        int px = i - panel0 * px_per_panel; // pixel number within the current arm
+        int arm = panel / ARM_LENGTH;
+	panel = panel % ARM_LENGTH;
+        int px = i - arm * ARM_LENGTH * px_per_panel; // pixel number within the current arm
 
         double k_px = (px - creep_speed * t) / ramp_length;
-        double k_panel = panel / (double)Math.max(arms[arm] - 1, 1);
+        double k_panel = (double)panel / (ARM_LENGTH - 1);
 
         double min_sat = .5;
         double max_sat = 1.;
         return OpcColor.getHsbColor(
-                arm / (double)arms.length,
+		(double)arm / total_arms,
                 (min_sat*(1-k_panel) + max_sat*k_panel),
                 MathUtil.fmod(k_px, 1.));
     }
