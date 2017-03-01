@@ -31,7 +31,8 @@ public class Rings extends XYAnimation {
         perlin = new Perlin();
     }
 
-    protected void preFrame(double t) {
+    @Override
+    protected void preFrame(double t, double deltaT) {
         double delta_t = t - last_t;
         last_t = t;
 
@@ -44,6 +45,7 @@ public class Rings extends XYAnimation {
         dz += (noise(t * 0.014) - 0.5) * zspeed * delta_t;
     }
 
+    @Override
     protected int samplePoint(PVector2 p, double t) {
         // Noise patterns are symmetrical around the origin and it looks weird. Move origin to corner.
         p = LayoutUtil.Vadd(p, LayoutUtil.V(1, 1));

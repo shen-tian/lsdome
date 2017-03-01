@@ -41,6 +41,7 @@ public class Twinkle extends DomeAnimation{
         }
     }
 
+    @Override
     public int drawPixel(DomeCoord c, double t) {
         double b = brightness.get(c);
         for (int i = 0; i < SIMULATED_SPEEDUP; i++) {

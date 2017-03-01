@@ -12,6 +12,7 @@ public class Kaleidoscope extends DomeAnimation {
     }
 
     // colors for the base panel. What algorithm is here?
+    // TODO these should be cached in preFrame
     int getBasePixel(DomeCoord c, double t) {
         PVector2 p = dome.getLocation(c);
         p = LayoutUtil.Vrot(p, t * (.5 + 3*.5*(Math.cos(.1213*t)+1)));
@@ -26,6 +27,7 @@ public class Kaleidoscope extends DomeAnimation {
 
     // This is the kaleidoscope effect. Depending on which panel, flip/rotate.
     // and copy the base panel's colors.
+    @Override
     public int drawPixel(DomeCoord c, double t) {
         int pos = MathUtil.mod(c.panel.u - c.panel.v, 3);
         int rot = MathUtil.mod(c.panel.getOrientation() == TriCoord.PanelOrientation.A ? 2*pos : 1-2*pos, 6);

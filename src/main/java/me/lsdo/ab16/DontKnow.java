@@ -22,7 +22,8 @@ public class DontKnow extends XYAnimation {
         perlin = new Perlin();
     }
 
-    protected void preFrame(double t) {
+    @Override
+    protected void preFrame(double t, double deltaT) {
         double delta_t = t - last_t;
         last_t = t;
 
@@ -34,6 +35,7 @@ public class DontKnow extends XYAnimation {
 
     }
 
+    @Override
     protected int samplePoint(PVector2 p, double t) {
         double minRadius = .2;
         double rotPeriod = 7.3854;

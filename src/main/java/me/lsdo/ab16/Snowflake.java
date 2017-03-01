@@ -15,6 +15,7 @@ public class Snowflake extends XYAnimation{
         perlin = new Perlin();
     }
 
+    @Override
     protected int samplePoint(PVector2 p, double t) {
             double minRadius = .2;
             double rotPeriod = 7.3854;  //s

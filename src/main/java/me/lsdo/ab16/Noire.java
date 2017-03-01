@@ -11,6 +11,7 @@ public class Noire extends XYAnimation {
         super(dome, opc);
     }
 
+    @Override
     protected int samplePoint(PVector2 p, double t) {
         double minRadius = .2;
         double rotPeriod = 7.3854;

@@ -12,6 +12,7 @@ public class GridTest extends DomeAnimation {
         super(dome, opc);
     }
 
+    @Override
     public int drawPixel(DomeCoord c, double t) {
         double demoPeriod = 4;
         int mode = (int)Math.floor(t / demoPeriod);

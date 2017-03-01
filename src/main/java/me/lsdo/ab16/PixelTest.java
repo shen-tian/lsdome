@@ -28,6 +28,7 @@ public class PixelTest extends DomeAnimation {
 	total_arms = (int)Math.ceil((double)dome.getNumPoints() / (px_per_panel * ARM_LENGTH));
     }
 
+    @Override
     protected int drawPixel(DomeCoord c, double t) {
         float creep_speed = 20;
         float ramp_length = 100;
