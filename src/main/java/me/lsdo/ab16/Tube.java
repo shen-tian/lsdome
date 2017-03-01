@@ -124,6 +124,7 @@ public class Tube extends XYAnimation {
 
     @Override
     protected int samplePoint(PVector2 uv, double t) {
+	// TODO move motion blur capability into XYAnimation?
 	double temporal_jitter = use_motion_blur ? (Math.random() - .5) / frameRate : 0.;
 	t += temporal_jitter;
 
