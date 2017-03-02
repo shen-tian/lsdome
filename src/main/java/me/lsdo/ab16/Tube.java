@@ -9,7 +9,6 @@ public class Tube extends XYAnimation {
     static final int DEFAULT_SUBSAMPLING = 4;
 
     double fov;  // Aperture from opposite ends of the display area, in degrees.
-    boolean use_motion_blur = true;
 
     // State variables for appearance of checker pattern
     double v_height = 1.; // Height of an on-off cycle
@@ -123,12 +122,8 @@ public class Tube extends XYAnimation {
     }
 
     @Override
-    protected int samplePoint(PVector2 uv, double t) {
-	// TODO move motion blur capability into XYAnimation?
-	double temporal_jitter = use_motion_blur ? (Math.random() - .5) / frameRate : 0.;
-	t += temporal_jitter;
-
-        double samplePos = this.pos + speed * temporal_jitter;
+    protected int samplePointWithMotionBlur(PVector2 uv, double t, double jitterT) {
+        double samplePos = this.pos + speed * jitterT;
 
         double u_unit = MathUtil.fmod(uv.x / (2*Math.PI), 1.);
         double dist = uv.y + samplePos;
