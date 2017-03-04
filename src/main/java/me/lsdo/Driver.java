@@ -14,6 +14,8 @@ public class Driver
             PixelFlock.main(new String[]{"me.lsdo.ab16.PixelFlock"});
         else if (args.length > 0 && args[0].equals("particlefft"))
             ParticleFFT.main(new String[]{"me.lsdo.ab16.ParticleFFT"});
+        else if (args.length > 0 && args[0].equals("video"))
+            VideoPlayer.main(new String[]{"me.lsdo.ab16.VideoPlayer"});
         else
             headless(args);
     }

@@ -41,6 +41,8 @@ file to configure where the OPC serer is. Sample file:
 
 #### Sketches
 
+*I think this section is incorrect-- processing sketches are now launched through the same lsdome entry point as above, yes? -drew*
+
 The sketches are a bit different. The source sits in the `src/sketches` folder.
 To run them: 
 
@@ -68,6 +70,13 @@ To build, goto root folder, then
     ./src/scripts/launchsketch.sh ~/processing-2.2.1 pixel_test
     
 This should yield magic.
+
+### Dependencies
+
+On ubuntu:
+
+    add-apt-repository ppa:mc3man/gstffmpeg-keep && apt-get update
+    apt-get install gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-ffmpeg gstreamer0.10-pulseaudio gstreamer0.10-alsa
 
 ### Simulator
 
