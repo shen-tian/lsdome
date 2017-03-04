@@ -5,17 +5,53 @@ mainClassName = "me.lsdo.Driver"
 
 // need the core Processing library to build.
 repositories {
+    flatDir {
+        dirs '/home/drew/sketchbook/libraries/lsdome/library'
+        dirs '/home/drew/processing-2.2.1/core/library'
+        dirs '/home/drew/processing-2.2.1/java/lib'
+        dirs '/home/drew/processing-2.2.1/lib'
+	dirs '/home/drew/processing-2.2.1/modes/java/libraries/video/library'
+    }
     jcenter()
     maven { url "http://clojars.org/repo" }
 }
 
 dependencies {
-    compile "org.processing:core:2.2.1"
-    //compile "org.jogamp.gluegen:gluegen-rt-main:2.1.5"
-    //compile "org.jogamp.jogl:jogl-all-main:2.1.5"
+    //compile "me.lsdo.processing:lsdome-processing:0.9.2"
+    compile name: 'lsdome'
+
     compile "junit:junit:3.8.2"
     compile "ddf.minim:ddf.minim:2.2.0"
-    compile "me.lsdo.processing:lsdome-processing:0.9.2"
+
+    // processing
+    compile name: 'ant'
+    compile name: 'ant-launcher'
+    compile name: 'antlr'
+    compile name: 'com.ibm.icu_4.4.2.v20110823'
+    compile name: 'core'	
+    compile name: 'gluegen-rt'
+    compile name: 'gluegen-rt-natives-linux-amd64'
+    compile name: 'gluegen-rt-natives-linux-armv6hf'
+    compile name: 'gluegen-rt-natives-linux-i586'
+    compile name: 'gluegen-rt-natives-macosx-universal'
+    compile name: 'gluegen-rt-natives-windows-amd64'
+    compile name: 'gluegen-rt-natives-windows-i586'
+    compile name: 'gstreamer-java'
+    compile name: 'jdi'
+    compile name: 'jdimodel'
+    compile name: 'jna'
+    compile name: 'jogl-all'
+    compile name: 'jogl-all-natives-linux-amd64'
+    compile name: 'jogl-all-natives-linux-armv6hf'
+    compile name: 'jogl-all-natives-linux-i586'
+    compile name: 'jogl-all-natives-macosx-universal'
+    compile name: 'jogl-all-natives-windows-amd64'
+    compile name: 'jogl-all-natives-windows-i586'
+    compile name: 'org-netbeans-swing-outline'
+    compile name: 'org.eclipse.osgi_3.8.1.v20120830-144521'
+    compile name: 'pde'
+    compile name: 'rt'
+    compile name: 'video'
 }
 
 sourceCompatibility = 1.6
@@ -31,3 +67,4 @@ jar {
 task wrapper(type: Wrapper) {
     gradleVersion = '3.0'
 }
+
