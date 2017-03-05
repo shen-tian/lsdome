@@ -46,8 +46,9 @@ public class ParticleFFT extends PApplet {
         fft = new FFT(in.bufferSize(), in.sampleRate());
         fftFilter = new float[fft.specSize()];
 
-        dot = loadImage("dot.png");
-        colors = loadImage("colors.png");
+	// TODO figure out where processing thinks the data dir is to avoid hardcoding these paths
+        dot = loadImage("/home/drew/dev/lsdome/lsdome/src/sketches/particle_fft/data/dot.png");
+        colors = loadImage("/home/drew/dev/lsdome/lsdome/src/sketches/particle_fft/data/colors.png");
     }
 
     public void draw()
