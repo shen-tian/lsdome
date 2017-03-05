@@ -13,6 +13,8 @@ import java.nio.*;
 
 // TODO support asymmetric stretching of dome canvas to match capture area dimensions
 // TODO support shrinking display area to get more of window visible, at expense of 'letterboxing'
+// TODO support aligning by either horizontal or vertical axis
+// TODO choose viewport automatically based on named window (os-specific)
 
 public class Screencast extends XYAnimation {
 
@@ -119,7 +121,7 @@ public class Screencast extends XYAnimation {
 	long start = System.currentTimeMillis();
 	grabber.captureFrame();
 	long end = System.currentTimeMillis();
-	//System.out.println(String.format("capture: %d ms", end - start));
+	//System.out.println(String.format("capture: %d ms   framerate: %.1f", end - start, frameRate));
     }
 
     @Override
