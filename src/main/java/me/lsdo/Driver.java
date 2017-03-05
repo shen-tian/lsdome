@@ -82,6 +82,9 @@ public class Driver
         } else if (name.equals("tube")) {
             System.out.println("Starting tube");
             animation = new Tube(dome, opc);
+        } else if (name.equals("screencast")) {
+            System.out.println("Starting screencast");
+            animation = new Screencast(dome, opc);
         } else {
 	    throw new RuntimeException("animation [" + name + "] not recognized");
 	}
