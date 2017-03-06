@@ -38,6 +38,7 @@ public class Driver
                     "twinkle",
                     "pixeltest",
                     "noire",
+		    "harmonics",
                     "snowflake",
                     "dontknow"};
             while (true)
@@ -85,6 +86,9 @@ public class Driver
         } else if (name.equals("screencast")) {
             System.out.println("Starting screencast");
             animation = new Screencast(dome, opc);
+        } else if (name.equals("harmonics")) {
+            System.out.println("Starting harmonics");
+            animation = new Harmonics(dome, opc);
         } else {
 	    throw new RuntimeException("animation [" + name + "] not recognized");
 	}
