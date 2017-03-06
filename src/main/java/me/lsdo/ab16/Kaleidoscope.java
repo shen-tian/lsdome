@@ -12,7 +12,6 @@ public class Kaleidoscope extends DomeAnimation {
     }
 
     // colors for the base panel. What algorithm is here?
-    // TODO these should be cached in preFrame
     int getBasePixel(DomeCoord c, double t) {
         PVector2 p = dome.getLocation(c);
         p = LayoutUtil.Vrot(p, t * (.5 + 3*.5*(Math.cos(.1213*t)+1)));
@@ -25,6 +24,17 @@ public class Kaleidoscope extends DomeAnimation {
                 .5 * (Math.cos(40*p.x)+1));
     }
 
+    // Compute the base panel upfront for efficiency. Since its content is copied to every
+    // other panel, the base panel pixels can be computed only once per frame and re-used.
+    @Override
+    public void preFrame(double t, double deltaT) {
+	for (DomeCoord c : dome.coords) {
+            if (c.panel.equals(basePanel)) {
+                dome.setColor(c, getBasePixel(c, t));
+            }
+        }
+    }
+    
     // This is the kaleidoscope effect. Depending on which panel, flip/rotate.
     // and copy the base panel's colors.
     @Override
@@ -37,7 +47,7 @@ public class Kaleidoscope extends DomeAnimation {
             basePx = basePx.flip(TriCoord.Axis.U);
         }
 
-        return getBasePixel(new DomeCoord(basePanel, basePx), t);
+        return dome.getColor(new DomeCoord(basePanel, basePx));
     }
 }
 
