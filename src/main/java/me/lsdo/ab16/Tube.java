@@ -21,6 +21,8 @@ public class Tube extends XYAnimation {
     // State variables for motion through the tube
     double speed = 1.;
     double pos = 0;
+
+    InputControl ctrl;
     
     public Tube(Dome dome, OPC opc) {
         this(dome, opc, DEFAULT_SUBSAMPLING, DEFAULT_FOV);
@@ -33,7 +35,9 @@ public class Tube extends XYAnimation {
     }
 
     private void initControl() {
-	/*
+        ctrl = new InputControl();
+	ctrl.init();
+	
         ctrl.registerHandler("jog_a", new InputControl.InputHandler() {
                 public void jog(boolean pressed) {
                     boolean forward = pressed;
@@ -97,7 +101,6 @@ public class Tube extends XYAnimation {
                     v_height = HMIN * Math.pow(HMAX / HMIN, val);
                 }
             });
-	*/
     }
 
     @Override
@@ -115,10 +118,9 @@ public class Tube extends XYAnimation {
 
     @Override
     protected void preFrame(double t, double deltaT){
+	ctrl.processInput();
+	
         pos += speed * deltaT;
-
-	// For debugging; remove once interactive control is added
-	speed *= 1.001;
     }
 
     @Override

@@ -1,6 +1,6 @@
 """
 Interface with a MIDI control device and dump certain midi events (button presses, slider
-movements, etc.) to stdout to be read by the processing process.
+movements, etc.) to a zero-mq pub/sub socket to be read by the processing process.
 """
 
 import pygame
@@ -8,6 +8,8 @@ from pygame.locals import *
 from pygame import midi
 import threading
 import time
+import uuid
+import zmq
 
 pygame.init()
 midi.init()
@@ -16,6 +18,8 @@ class MIDIDevice(threading.Thread):
     def __init__(self, interface_name):
         threading.Thread.__init__(self)
 
+        self.uid = uuid.uuid4().hex[:8]
+        
         self.init_hardware(interface_name)
         self.subscribers = []
 
@@ -57,11 +61,14 @@ class MIDIDevice(threading.Thread):
             data, timecode = ev
             yield self.parse_midi_event(data)
 
+    def format_event_message(self, name, val):
+        return '%s:%s:%s:%s' % (self.uid, self.device_type, name, val)
+            
     def run(self):
         while self.up:
             events = filter(None, self.get_events())
             for ev in events:
-                self.broadcast(ev)
+                self.broadcast(self.format_event_message(*ev))
             time.sleep(0.01)
 
         self.destroy_hardware()
@@ -71,6 +78,8 @@ class MIDIDevice(threading.Thread):
 
 class DJ2GoDevice(MIDIDevice):
 
+    device_type = 'dj2go'
+    
     controls = {
          13: ('pitch_a', 'slider'),
          67: ('pitch_inc_a', 'button'),
@@ -108,34 +117,22 @@ class DJ2GoDevice(MIDIDevice):
                 0x90: 'press',
                 0x80: 'release',
             }[action]
-            #return {'control': name, 'action': action}
-            return '%s %s' % (name, action)
         elif type == 'slider':
-            #return {'control': name, 'value': val}
-            return '%s %s' % (name, val)
+            action = val
         elif type == 'jog':
             action = {
                 127: 'dec',
                 1: 'inc',
             }[val]
-            #return {'control': name, 'action': action}
-            return '%s %s' % (name, action)
         else:
             raise RuntimeError('unrecognized control type [%s]' % type)
 
-class KeyboardDevice(MIDIDevice):
-    def parse_midi_event(self, raw):
-        try:
-            state = {
-                0x90: 'on',
-                0x80: 'off',
-            }[raw[0]]
-        except KeyError:
-            return None
-        note = raw[1]
-        return {'state': state, 'note': note}
-
+        return name, action
+        
 class MockDevice(MIDIDevice):
+
+    device_type = 'mock'
+    
     class OutputStub(object):
         def __getattr__(self, name):
             def method(*args, **kwargs):
@@ -173,7 +170,7 @@ class MockDevice(MIDIDevice):
                 self.keycodes[raw.key] = None
         note = self.keycodes[raw.key]
         
-        return {'state': state, 'note': note}
+        return note, state
 
 def get_devices(name):
     id_in, id_out = None, None
@@ -187,24 +184,31 @@ def get_devices(name):
     return id_in, id_out
 
 
+class EchoHandler(object):
+    def received(self, data):
+        print data
 
-
-
+class SocketHandler(object):
+    def __init__(self, port):
+        context = zmq.Context()
+        self.socket = context.socket(zmq.PUB)
+        self.socket.bind("tcp://*:%s" % port)
+    
+    def received(self, data):
+        self.socket.send(data)
 
 if __name__ == "__main__":
 
     try:
         device = DJ2GoDevice('Numark DJ2Go MIDI 1')
+        print 'loaded device'
     except IOError:
         device = MockDevice()
         print 'using mock device'
     device.start()
 
-    class Handler(object):
-        def received(self, data):
-            print data
-    handler = Handler()
-    device.subscribe(handler)
+    device.subscribe(EchoHandler())
+    device.subscribe(SocketHandler(5556))
 
     try:
         while True:
