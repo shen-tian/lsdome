@@ -51,26 +51,6 @@ into your processing libraries folder.
 2. Open the relevant sketch in Processing 2.
 3. Build, run. Blah. 
 
-The legacy instructions below probably also works.
-
-### Install (Legacy)
-
-1. Download Processing 2 (As of time of writing, this should be 2.2.1). Unpack
-this into a folder (`~\processing-2.2.1`) for rest of the document.
-2. Open Processing IDE. Do Tools -> Install processing-java. Do it for individual
-or something ensure that it's in the processing folder.
-3. Ensure java JDK is installed. (i.e. javac is there)
-4. `git clone` blah blah.
-
-Add the `lsdome-processing` lib to your Processing. Follow the instruction on
-the project page.
-
-To build, goto root folder, then
-
-    ./src/scripts/launchsketch.sh ~/processing-2.2.1 pixel_test
-    
-This should yield magic.
-
 ### Dependencies
 
 On ubuntu:
