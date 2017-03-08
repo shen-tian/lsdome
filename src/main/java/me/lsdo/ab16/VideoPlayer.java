@@ -57,8 +57,10 @@ public class VideoPlayer extends PApplet {
 	System.out.println(mov);
         this.sizeMode = VideoSizing.STRETCH_TO_FIT;
         this.contrastStretch = true;
-	
-        mov.play(); // or loop() ?
+
+	// TODO make a setting
+        mov.play();
+	//mov.loop();
         playing = true;
         System.out.println("duration: " + mov.duration());
         // TODO some event when playback has finished?
@@ -105,29 +107,13 @@ public class VideoPlayer extends PApplet {
     } 
 
     void setProjectionArea() {
-        double xmin = simple.getDome().getRadius();
-        double xmax = -simple.getDome().getRadius();
-        double ymin = simple.getDome().getRadius();
-        double ymax = -simple.getDome().getRadius();
-        for (DomeCoord c : simple.getDome().coords) {
-	    PVector2 p = simple.getDome().getLocation(c);
-            xmin = Math.min(xmin, p.x);
-            xmax = Math.max(xmax, p.x);
-            ymin = Math.min(ymin, p.y);
-            ymax = Math.max(ymax, p.y);
-        }
-        double margin = .5*LayoutUtil.pixelSpacing(simple.getDome().getPanelSize());
-        xmin -= margin;
-        xmax += margin;
-        ymin -= margin;
-        ymax += margin;
-
-	PVector2 p0 = LayoutUtil.xyToScreen(LayoutUtil.V(xmin, ymax), this.width, this.height, 2*simple.getDome().getRadius(), true);
-        PVector2 pdiag = LayoutUtil.Vsub(LayoutUtil.xyToScreen(LayoutUtil.V(xmax, ymin), this.width, this.height, 2*simple.getDome().getRadius(), true), p0);
+	PVector2 viewport[] = simple.getDome().getViewport();
+	PVector2 p0 = LayoutUtil.xyToScreen(viewport[0], this.width, this.height, 2*simple.getDome().getRadius(), true);
+        PVector2 p1 = LayoutUtil.xyToScreen(LayoutUtil.Vadd(viewport[0], viewport[1]), this.width, this.height, 2*simple.getDome().getRadius(), true);
         px0 = p0.x;
-        py0 = p0.y;
-        pw = pdiag.x;
-        ph = pdiag.y;
+        py0 = p1.y;
+        pw = p1.x - p0.x;
+        ph = p0.y - p1.y;
 
 	System.out.println(px0 + " " + py0 + " " + pw + " " + ph);
     }
