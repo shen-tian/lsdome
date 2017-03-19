@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.headless;
 
 /*
  * Demo the properties of the triangular pixel grid.

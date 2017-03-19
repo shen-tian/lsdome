@@ -1,6 +1,7 @@
 package me.lsdo;
 
-import me.lsdo.ab16.*;
+import me.lsdo.sketches.headless.*;
+import me.lsdo.sketches.processing.*;
 import me.lsdo.processing.*;
 
 import java.util.Random;
@@ -11,11 +12,11 @@ public class Driver
 
     public static void main(String[] args){
         if (args.length > 0 && args[0].equals("pixelflock"))
-            PixelFlock.main(new String[]{"me.lsdo.ab16.PixelFlock"});
+            PixelFlock.main(new String[]{"me.lsdo.sketches.processing.PixelFlock"});
         else if (args.length > 0 && args[0].equals("particlefft"))
-            ParticleFFT.main(new String[]{"me.lsdo.ab16.ParticleFFT"});
+            ParticleFFT.main(new String[]{"me.lsdo.sketches.processing.ParticleFFT"});
         else if (args.length > 0 && args[0].equals("video"))
-            VideoPlayer.main(new String[]{"me.lsdo.ab16.VideoPlayer"});
+            VideoPlayer.main(new String[]{"me.lsdo.sketches.processing.VideoPlayer"});
         else
             headless(args);
     }

@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.util;
 
 /**
  * Created by shen on 2016/09/17.
@@ -14,10 +14,10 @@ public // The Boid class
 
 class Boid {
 
-    PVector location;
-    PVector velocity;
+    public PVector location;
+    public PVector velocity;
     PVector acceleration;
-    float r;
+    public float r;
     float maxforce;    // Maximum steering force
     float maxspeed;    // Maximum speed
     int currentHue;
@@ -42,7 +42,7 @@ class Boid {
 
     private Random random;
 
-    Boid(float x, float y, int hue, int boxWidth, int boxHeight) {
+    public Boid(float x, float y, int hue, int boxWidth, int boxHeight) {
         acceleration = new PVector(0, 0);
         velocity = PVector.random2D();
         location = new PVector(x, y);
@@ -130,7 +130,7 @@ class Boid {
         return steer;
     }
 
-    int[] getColour() {
+    public int[] getColour() {
         int hue = currentHue + hueOffset;
         int[] col = new int[] {
                 hue, sat, light, 100

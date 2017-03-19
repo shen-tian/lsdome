@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.headless;
 
 import processing.core.*;
 import me.lsdo.processing.*;
@@ -127,7 +127,8 @@ public class Screencast extends XYAnimation {
 	    return frame.getRGB(x, y);
 	}
     }
-    
+
+    // decent framerate, but still has a slight delay
     public class OpenCvGrabber extends ScreenGrabber {
 	FFmpegFrameGrabber grabber;
 	OpenCVFrameConverter.ToIplImage converter;

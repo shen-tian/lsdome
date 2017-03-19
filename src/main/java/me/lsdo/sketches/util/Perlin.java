@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.util;
 
 import java.util.Random;
 

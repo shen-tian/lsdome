@@ -1,26 +1,31 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.headless;
 
 /*
  * Fractal noise animation. Modified version of Micah Scott's code at
  * https://github.com/scanlime/fadecandy/tree/master/examples/processing/grid24x8z_clouds
  */
 
+import me.lsdo.sketches.util.*;
+import processing.core.*;
 import me.lsdo.processing.*;
 
-public class Cloud extends XYAnimation {
+public class Rings extends XYAnimation {
 
-    private double dx;
-    private double dy;
-    private double dz;
+    int mode;
 
-    private double last_t;
+    double dx;
+    double dy;
+    double dz;
 
-    private double noiseScale=0.02;
+    double last_t;
 
-    private Perlin perlin;
+    double noiseScale=0.02;
 
-    public Cloud(Dome dome, OPC opc) {
+    Perlin perlin;
+
+    public Rings(Dome dome, OPC opc) {
         super(dome, opc);
+        mode = 0;
 
         dx = dy = dz = 0;
 
@@ -50,14 +55,22 @@ public class Cloud extends XYAnimation {
         double hue = .1 * t;
         double scale = .75;
 
-        double n = fractalNoise(dx + p.x*scale, dy + p.y*scale, z) - 0.75;
+        double saturation = constrain(Math.pow(1.15 * noise(t * 0.122), 2.5), 0, 1);
+        double spacing = noise(t * 0.124) * 15.;
+
+        double centerx = noise(t *  0.125) * 2.5;
+        double centery = noise(t * -0.125) * 2.5;
+
+        double dist = Math.sqrt(Math.pow(p.x - centerx, 2) + Math.pow(p.y - centery, 2));
+        double pulse = (Math.sin(dz + dist * spacing) - 0.3) * 0.3;
+
+        double n = fractalNoise(dx + p.x*scale + pulse, dy + p.y*scale, z) - 0.75;
         double m = fractalNoise(dx + p.x*scale, dy + p.y*scale, z + 10.0) - 0.75;
 
         return OpcColor.getHsbColor(
-                MathUtil.fmod(hue + .8 * m, 1.),
-                1. - constrain(Math.pow(3.0 * n, 3.5), 0, 0.9),
-                constrain(Math.pow(3.0 * n, 1.5), 0, 0.9)
-        );
+                MathUtil.fmod(hue + .4 * m, 1.),
+                saturation,
+                constrain(Math.pow(3.0 * n, 1.5), 0, 0.9));
     }
 
     private double fractalNoise(double x, double y, double z) {
@@ -86,3 +99,5 @@ public class Cloud extends XYAnimation {
     }
 
 }
+
+

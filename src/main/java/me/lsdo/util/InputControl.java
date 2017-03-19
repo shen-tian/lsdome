@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.util;
 
 import java.io.*;
 import java.util.*;
@@ -20,7 +20,7 @@ public class InputControl {
     Map<String, InputHandler> handlers;
     Socket subscriber;
 
-    static class InputHandler {
+    public static class InputHandler {
         void button(boolean pressed) {
             throw new RuntimeException("handler did not override!");
         }
@@ -38,18 +38,18 @@ public class InputControl {
 	handlers = new HashMap<String, InputHandler>();
     }
     
-    void init() {
+    public void init() {
 	Context context = ZMQ.context(1);
         subscriber = context.socket(ZMQ.SUB);
         subscriber.connect("tcp://localhost:" + PORT);
         subscriber.subscribe(new byte[0]);
     }
 
-    void registerHandler(String controlName, InputHandler handler) {
+    public void registerHandler(String controlName, InputHandler handler) {
         handlers.put(controlName, handler);
     }
 
-    void processInput() {
+    public void processInput() {
 	while (true) {
 	    String msg = subscriber.recvStr(ZMQ.NOBLOCK);
 	    if (msg == null) {

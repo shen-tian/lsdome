@@ -1,5 +1,6 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.headless;
 
+import me.lsdo.util.InputControl;
 import java.io.*;
 import me.lsdo.processing.*;
 
@@ -49,13 +50,13 @@ public class Tube extends XYAnimation {
                         final double SPEED_STEP = .001;
                         speed += (forward ? 1 : -1) * SPEED_STEP;
                     }
-                    System.out.println(""+speed);
+                    System.out.println("speed: " + speed);
                 }
             });
         ctrl.registerHandler("browse", new InputControl.InputHandler() {
                 public void jog(boolean pressed) {
                     h_checks += (pressed ? 1 : -1);
-                    System.out.println(h_checks);
+                    System.out.println("h-checks: " + h_checks);
                 }
             });
         ctrl.registerHandler("jog_b", new InputControl.InputHandler() {
@@ -68,22 +69,26 @@ public class Tube extends XYAnimation {
                         final double SKEW_STEP = .001;
                         h_skew += (forward ? 1 : -1) * SKEW_STEP;
                     }
+                    System.out.println("h-skew: " + h_skew);
                 }
             });
         ctrl.registerHandler("pitch_a", new InputControl.InputHandler() {
                 public void slider(double val) {
                     h_asym = val;
+		    System.out.println("h-asym: " + h_asym);
                 }
             });
         ctrl.registerHandler("pitch_b", new InputControl.InputHandler() {
                 public void slider(double val) {
                     v_asym = val;
+		    System.out.println("v-asym: " + v_asym);		    
                 }
             });
         ctrl.registerHandler("pitch_inc_a", new InputControl.InputHandler() {
                 public void button(boolean pressed) {
                     if (pressed) {
                         v_offset += 1;
+			System.out.println("v-offset: " + v_offset);
                     }
                 }
             });
@@ -91,6 +96,7 @@ public class Tube extends XYAnimation {
                 public void button(boolean pressed) {
                     if (pressed) {
                         v_offset -= 1;
+			System.out.println("v-offset: " + v_offset);
                     }
                 }
             });
@@ -99,6 +105,7 @@ public class Tube extends XYAnimation {
                     double HMIN = .2;
                     double HMAX = 8.;
                     v_height = HMIN * Math.pow(HMAX / HMIN, val);
+		    System.out.println("v-height: " + v_height);
                 }
             });
     }

@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.util;
 
 /**
  * Created by shen on 2016/09/17.
@@ -7,20 +7,20 @@ package me.lsdo.ab16;
 import java.util.ArrayList;
 
 public class BoidFlock {
-    ArrayList<Boid> boids; // An ArrayList for all the boids
+    public ArrayList<Boid> boids; // An ArrayList for all the boids
     int currentHue = 60;
 
-    BoidFlock() {
+    public BoidFlock() {
         boids = new ArrayList<Boid>(); // Initialize the ArrayList
     }
 
-    void run() {
+    public void run() {
         for (Boid b : boids) {
             b.run(boids);  // Passing the entire list of boids to each boid individually
         }
     }
 
-    void cycleHue() {
+    public void cycleHue() {
         int newHue = currentHue + 1;
         if (newHue > 100) {
             newHue = newHue - 100;
@@ -31,13 +31,13 @@ public class BoidFlock {
         }
     }
 
-    void setBrightness(int brightness) {
+    public void setBrightness(int brightness) {
         for (Boid b : boids) {
             b.setBrightness(brightness);
         }
     }
 
-    void scatterFlock() {
+    public void scatterFlock() {
         for (Boid b : boids) {
             b.sepWeight = 10.0f;
             b.aliWeight= 0.0f;
@@ -46,7 +46,7 @@ public class BoidFlock {
         }
     }
 
-    void collectFlock() {
+    public void collectFlock() {
         for (Boid b : boids) {
             b.sepWeight = 1.5f;
             b.aliWeight= 1.0f;
@@ -55,7 +55,7 @@ public class BoidFlock {
         }
     }
 
-    void addBoid(Boid b) {
+    public void addBoid(Boid b) {
         boids.add(b);
     }
 }

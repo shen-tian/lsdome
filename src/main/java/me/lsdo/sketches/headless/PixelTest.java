@@ -1,4 +1,4 @@
-package me.lsdo.ab16;
+package me.lsdo.sketches.headless;
 
 /*
  * A sketch to help debug the proper placement of panels.
