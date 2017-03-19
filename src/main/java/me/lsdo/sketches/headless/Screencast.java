@@ -193,6 +193,8 @@ public class Screencast extends XYAnimation {
 
     // depends on x11
     private PVector2[] getWindowPlacement(String targetTitle, int targetPid) {
+	final int POLL_INTERVAL = 300;  // ms
+	
 	while(true) {
 	    try {
 		Process p = Runtime.getRuntime().exec("wmctrl -l -G -p");
@@ -221,14 +223,14 @@ public class Screencast extends XYAnimation {
 		    String title = sb.toString();
 		    
 		    if ((targetPid > 0 && pid == targetPid) ||
-			(!targetTitle.isEmpty() && title.startsWith(targetTitle))) {
+			(!targetTitle.isEmpty() && title.toLowerCase().startsWith(targetTitle.toLowerCase()))) {
 			System.out.println("found window");
 			return new PVector2[] {LayoutUtil.V(xo, yo), LayoutUtil.V(width, height)};
 		    }
 		}
 
 		System.out.println("window not found");
-		Thread.sleep(1000);
+		Thread.sleep(POLL_INTERVAL);
 	    } catch (Exception e) {
 		throw new RuntimeException(e);
 	    }
