@@ -27,7 +27,9 @@ Work in progress: the project is split between two parts right now:
 #### Headless java app
 
 The headless code is organised as a Java app. It's built by `gradle`.
-`gradle installDist` places it in the `\build\install\lsdome` folder.
+Before running `gradle`, set `local_processing_install` in `build.gradle`
+to the path of your processing installation.
+`gradle installDist` builds and places it in the `\build\install\lsdome` folder.
 Running the `./bin/lsdome` script launches it. It accepts these parameters:
 
     lsdome [cloud|rings|kaleidoscope|twinkle|pixeltest]
@@ -38,18 +40,6 @@ file to configure where the OPC serer is. Sample file:
 
     opchostname=192.168.1.123
     opcport=7890
-
-#### Sketches
-
-*I think this section is incorrect-- processing sketches are now launched through the same lsdome entry point as above, yes? -drew*
-
-The sketches are a bit different. The source sits in the `src/sketches` folder.
-To run them: 
-
-1. Install [lsdome-processing](https://github.com/shen-tian/lsdome-processing)
-into your processing libraries folder.
-2. Open the relevant sketch in Processing 2.
-3. Build, run. Blah. 
 
 ### Dependencies
 
