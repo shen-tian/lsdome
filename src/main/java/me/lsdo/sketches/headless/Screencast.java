@@ -18,8 +18,8 @@ public class Screencast extends XYAnimation {
     
     int width;
     int height;
-    int xo = 200;
-    int yo = 200;
+    int xo;
+    int yo;
     boolean alignHorizontal;
     double xscale;
     double yscale;
@@ -28,66 +28,74 @@ public class Screencast extends XYAnimation {
     PVector2 viewportDim;
     
     public Screencast(Dome dome, OPC opc) {
-	this(dome, opc, 512);
+	super(dome, opc, Config.getSketchProperty("subsampling", SUBSAMPLING));
+
+	int width = Config.getSketchProperty("width", 512);
+	// If height omitted, screen pixels will map to dome canvas 1:1 (i.e., square
+	// pixels); if height specified, x- and y-axes will independently stretch to
+	// match the dome viewport bounding box.
+	int height = Config.getSketchProperty("height", -1);
+
+	// Top-left screen coordinate of the screengrab area.
+	int xo = Config.getSketchProperty("xoffset", 200);
+	int yo = Config.getSketchProperty("yoffset", 200);
+
+	// Align dome axis to horizontal or vertical axis of screen.
+	boolean alignHorizontal = Config.getSketchProperty("align_horiz", true);
+
+	// Further shrink the screencap window by these factors, in order to get more
+	// of the window corners to fall within the dome's renderable area.
+	double xscale = Config.getSketchProperty("xscale", 1.);
+	double yscale = Config.getSketchProperty("yscale", 1.);
+
+	// Try to match viewport to a GUI window, specified by either window title or
+	// pid. Not all apps support matching by pid. Title match is prefix-based.
+	// First matching window is used. Will hang and keep searching until a matching
+	// window is found. Will not readjust viewport if window is moved.
+	String title = Config.getSketchProperty("title", "");
+	int pid = Config.getSketchProperty("pid", 0);
+	if (!title.isEmpty() || pid > 0) {
+	    PVector2 windowPlacement[] = getWindowPlacement(title, pid);
+	    width = (int)windowPlacement[1].x;
+	    height = (int)windowPlacement[1].y;
+	    xo = (int)windowPlacement[0].x;
+	    yo = (int)windowPlacement[0].y;
+	    System.out.println(String.format("%dx%d+%d,%d", width, height, xo, yo));
+	}
+	
+	initViewport(width, height, xo, yo, alignHorizontal, xscale, yscale);
     }
 
-    
-    // screencap a square of size x size pixels without any stretching
-    public Screencast(Dome dome, OPC opc, int size) {
-        super(dome, opc, SUBSAMPLING);
-	this.width = size;
-	this.height = size;
-	this.alignHorizontal = true;
-	this.xscale = 1.;
-	this.yscale = 1.;
-
-	initGrabber();
-
-	viewport0 = LayoutUtil.V(-1, -1);
-	viewportDim = LayoutUtil.V(2, 2);
-    }
-
-    
-    public Screencast(Dome dome, OPC opc, int width, int height, boolean alignHorizontal) {
-	this(dome, opc, width, height, alignHorizontal, 1., 1.);
-    }
-
-    // screencap a width x height area, stretching to perfecting fit the dome viewport
-    public Screencast(Dome dome, OPC opc, int width, int height, boolean alignHorizontal, double xscale, double yscale) {
-        super(dome, opc, SUBSAMPLING);
+    public void initViewport(int width, int height, int xo, int yo, boolean alignHorizontal, double xscale, double yscale) {
+	boolean snapViewport;
+	if (height > 0) {
+	    snapViewport = true;
+	} else {
+	    snapViewport = false;
+	    height = width;
+	}
+	
 	this.width = width;
 	this.height = height;
+	this.xo = xo;
+	this.yo = yo;
 	this.alignHorizontal = alignHorizontal;
 	this.xscale = xscale;
 	this.yscale = yscale;
 
 	initGrabber();
-	initViewport();
-    }
-
-
-    public Screencast(Dome dome, OPC opc, String pidOrTitle) {
-	this(dome, opc, pidOrTitle, true, 1., 1.);
-    }
-
-    // screencap while matching the dimensions to a specific window
-    public Screencast(Dome dome, OPC opc, String pidOrTitle, boolean alignHorizontal, double xscale, double yscale) {
-        super(dome, opc, SUBSAMPLING);
-	PVector2 windowPlacement[] = getWindowPlacement(pidOrTitle);
-	this.width = (int)windowPlacement[1].x;
-	this.height = (int)windowPlacement[1].y;
-	this.xo = (int)windowPlacement[0].x;
-	this.yo = (int)windowPlacement[0].y;
-	System.out.println(String.format("%dx%d+%d,%d", width, height, xo, yo));
-	this.alignHorizontal = alignHorizontal;
-	this.xscale = xscale;
-	this.yscale = yscale;
-
-	initGrabber();
-	initViewport();
+	
+	if (snapViewport) {
+	    PVector2 viewport[] = dome.getViewport(rotAngle());
+	    viewport0 = normalizePoint(viewport[0]);
+	    viewportDim = normalizePoint(viewport[1]);
+	} else {
+	    viewport0 = LayoutUtil.V(-1, -1);
+	    viewportDim = LayoutUtil.V(2, 2);
+	}
     }
     
-    public abstract class ScreenGrabber {
+    public static abstract class ScreenGrabber {
 	int width;
 	int height;
 	int x0;
@@ -105,7 +113,7 @@ public class Screencast extends XYAnimation {
     }
 
     // simple and portable, but slow as balls
-    public class RobotGrabber extends ScreenGrabber {
+    public static class RobotGrabber extends ScreenGrabber {
 	Robot robot;
 	BufferedImage frame;
 
@@ -129,7 +137,7 @@ public class Screencast extends XYAnimation {
     }
 
     // decent framerate, but still has a slight delay
-    public class OpenCvGrabber extends ScreenGrabber {
+    public static class OpenCvGrabber extends ScreenGrabber {
 	FFmpegFrameGrabber grabber;
 	OpenCVFrameConverter.ToIplImage converter;
 	IplImage img;
@@ -173,18 +181,18 @@ public class Screencast extends XYAnimation {
     }
 
     private void initGrabber() {
-	//grabber = new RobotGrabber(width, height, xo, yo);
-	grabber = new OpenCvGrabber(width, height, xo, yo);
-    }
-
-    private void initViewport() {
-	PVector2 viewport[] = dome.getViewport(rotAngle());
-	viewport0 = normalizePoint(viewport[0]);
-	viewportDim = normalizePoint(viewport[1]);
+	String grabberName = Config.getSketchProperty("grabber", "opencv");
+	if (grabberName.equals("robot")) {
+	    grabber = new RobotGrabber(width, height, xo, yo);
+	} else if (grabberName.equals("opencv")) {
+	    grabber = new OpenCvGrabber(width, height, xo, yo);
+	} else {
+	    throw new RuntimeException("unknown grabber type: " + grabberName);
+	}
     }
 
     // depends on x11
-    private PVector2[] getWindowPlacement(String pidOrTitle) {
+    private PVector2[] getWindowPlacement(String targetTitle, int targetPid) {
 	while(true) {
 	    try {
 		Process p = Runtime.getRuntime().exec("wmctrl -l -G -p");
@@ -198,7 +206,7 @@ public class Screencast extends XYAnimation {
 			continue;
 		    }
 
-		    String pid = parts[2];
+		    int pid = Integer.parseInt(parts[2]);
 		    int xo = Integer.parseInt(parts[3]);
 		    int yo = Integer.parseInt(parts[4]);
 		    int width = Integer.parseInt(parts[5]);
@@ -212,7 +220,8 @@ public class Screencast extends XYAnimation {
 		    }
 		    String title = sb.toString();
 		    
-		    if (pid.equals(pidOrTitle) || title.startsWith(pidOrTitle)) {
+		    if ((targetPid > 0 && pid == targetPid) ||
+			(!targetTitle.isEmpty() && title.startsWith(targetTitle))) {
 			System.out.println("found window");
 			return new PVector2[] {LayoutUtil.V(xo, yo), LayoutUtil.V(width, height)};
 		    }

@@ -24,10 +24,9 @@ enum VideoSizing {
 
 public class VideoPlayer extends PApplet {
 
-    // TODO read this from properties
-    //final String video_path = "/home/drew/Videos/lsdome/eye1.mp4";
-    //final String video_path = "/home/drew/Videos/lsdome/eye2.mp4";
-    final String video_path = "/home/drew/Videos/lsdome/the_knife-we_share_our_mothers_health.mp4";
+    // /home/drew/Videos/lsdome/eye1.mp4
+    // /home/drew/Videos/lsdome/eye2.mp4
+    // /home/drew/Videos/lsdome/the_knife-we_share_our_mothers_health.mp4
     
     CanvasSketch simple;
 
@@ -45,22 +44,28 @@ public class VideoPlayer extends PApplet {
     double ph;
     boolean sizeModeInitialized = false;
 
-    // TODO support constructors
-
     public void setup() {
+
 	// TODO size based on density? and lower subsampling
         size(300, 300);
 
         simple = new CanvasSketch(this, new Dome(), new OPC());
 
-        mov = new Movie(this, video_path);
-	System.out.println(mov);
+	String path = Config.getSketchProperty("path", "");
+	if (path.isEmpty()) {
+	    throw new RuntimeException("must specify video path in sketch.properties!");
+	}
+	boolean repeat = Config.getSketchProperty("repeat", true);
+	
+        mov = new Movie(this, path);
         this.sizeMode = VideoSizing.STRETCH_TO_FIT;
         this.contrastStretch = true;
 
-	// TODO make a setting
-        mov.play();
-	//mov.loop();
+	if (repeat) {
+	    mov.loop();
+	} else {
+	    mov.play();
+	}
         playing = true;
         System.out.println("duration: " + mov.duration());
         // TODO some event when playback has finished?

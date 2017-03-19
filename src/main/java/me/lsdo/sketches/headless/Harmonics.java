@@ -30,7 +30,7 @@ public class Harmonics extends DomeAnimation {
 		panelCount.put(c.panel, panelCount.size());
 	    }
 	}
-	cycleLength = BASELINE_CYCLE_LENGTH * panelCount.size();
+	cycleLength = Config.getSketchProperty("cycle", BASELINE_CYCLE_LENGTH) * panelCount.size();
     }
     
     private double cycle(double t, double period, double min, double max) {
