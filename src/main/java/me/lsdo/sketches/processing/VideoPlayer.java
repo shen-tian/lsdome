@@ -24,9 +24,8 @@ enum VideoSizing {
 
 public class VideoPlayer extends PApplet {
 
-    // /home/drew/Videos/lsdome/eye1.mp4
-    // /home/drew/Videos/lsdome/eye2.mp4
-    // /home/drew/Videos/lsdome/the_knife-we_share_our_mothers_health.mp4
+    //final String DEMO_VIDEO = "res/mov/bm2014_mushroom_cloud.mp4";
+    final String DEMO_VIDEO = "res/mov/trexes_thunderdome.mp4";
     
     CanvasSketch simple;
 
@@ -51,7 +50,7 @@ public class VideoPlayer extends PApplet {
 
         simple = new CanvasSketch(this, new Dome(), new OPC());
 
-	String path = Config.getSketchProperty("path", "");
+	String path = Config.getSketchProperty("path", DEMO_VIDEO);
 	if (path.isEmpty()) {
 	    throw new RuntimeException("must specify video path in sketch.properties!");
 	}
