@@ -43,6 +43,8 @@ file to configure where the OPC serer is. Sample file:
 
 ### Dependencies
 
+You must install Processing 2.2.1
+
 On ubuntu:
 
     add-apt-repository ppa:mc3man/gstffmpeg-keep && apt-get update
