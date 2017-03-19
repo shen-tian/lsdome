@@ -46,9 +46,12 @@ public class ParticleFFT extends PApplet {
         fft = new FFT(in.bufferSize(), in.sampleRate());
         fftFilter = new float[fft.specSize()];
 
-	// TODO figure out where processing thinks the data dir is to avoid hardcoding these paths
-        dot = loadImage("/home/drew/dev/lsdome/lsdome/src/sketches/particle_fft/data/dot.png");
-        colors = loadImage("/home/drew/dev/lsdome/lsdome/src/sketches/particle_fft/data/colors.png");
+	// When not launching via processing, we must munge the sketch path so that
+	// processing can find the data files. This also presumes the binary is launched
+	// from the lsdome repo root dir.
+	sketchPath = "res/img";
+        dot = loadImage("dot.png");
+        colors = loadImage("colors.png");
     }
 
     public void draw()
