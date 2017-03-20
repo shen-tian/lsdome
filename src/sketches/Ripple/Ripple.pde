@@ -13,7 +13,7 @@ CanvasSketch simple;
 void setup()
 {
     size(300, 300);
-    simple = new CanvasSketch(this, new Dome(6), new OPC());
+    simple = new CanvasSketch(this, new Dome(), new OPC());
     image = loadImage("img.jpg");
     colorMode(HSB, 100);
     ndata = new float[width][height];
