@@ -1,85 +1,91 @@
 package me.lsdo;
 
-import me.lsdo.ab16.*;
+import me.lsdo.sketches.headless.*;
+import me.lsdo.sketches.processing.*;
 import me.lsdo.processing.*;
+import processing.core.*;
 
-import java.util.Random;
+import java.util.*;
 
 public class Driver
 {
-    public static final int FPS_CAP = 30;
+    public static final int FPS_CAP = 60;
 
-    public static void main(String[] args){
-        if (args.length > 0 && args[0].equals("pixelflock"))
-            PixelFlock.main(new String[]{"me.lsdo.ab16.PixelFlock"});
-        else if (args.length > 0 && args[0].equals("particlefft"))
-            ParticleFFT.main(new String[]{"me.lsdo.ab16.ParticleFFT"});
-        else
-            headless(args);
+    static Map<String, Class> processingSketches = new HashMap<String, Class>();
+    static Map<String, Class> headlessSketches = new HashMap<String, Class>();
+
+    static {
+	processingSketches.put("pixelflock", PixelFlock.class);
+	processingSketches.put("particlefft", ParticleFFT.class);
+	processingSketches.put("video", VideoPlayer.class);
+
+	headlessSketches.put("cloud", Cloud.class);
+	headlessSketches.put("dontknow", DontKnow.class);
+	headlessSketches.put("gridtest", GridTest.class);
+	headlessSketches.put("harmonics", Harmonics.class);
+	headlessSketches.put("kaleidoscope", Kaleidoscope.class);
+	headlessSketches.put("noire", Noire.class);
+	headlessSketches.put("pixeltest", PixelTest.class);
+	headlessSketches.put("rings", Rings.class);
+	headlessSketches.put("screencast", Screencast.class);
+	headlessSketches.put("snowflake", Snowflake.class);
+	headlessSketches.put("tube", Tube.class);
+	headlessSketches.put("twinkle", Twinkle.class);
     }
+    
+    public static void main(String[] args){
+	if (args.length > 0 && processingSketches.containsKey(args[0])) {
+	    Class<PApplet> sketch = processingSketches.get(args[0]);
+	    PApplet app;
+	    try {
+		app = sketch.newInstance();
+	    } catch (Exception e) {
+		throw new RuntimeException(e);
+	    }
+	    app.main(new String[] {sketch.getName()});
+	} else {
+	    // Headless
+	    Dome dome = new Dome();
+	    OPC opc = new OPC();
 
-    public static void headless(String[] args) {
+	    if (args.length > 0) {
+		RunAnimation(dome, opc, args[0], 0);
+	    } else {
+		// TODO this should probably be replaced by last year's python launcher
+		// script, which can also shuffle parameters within each sketch, and
+		// avoid running the same sketch twice in a row.
+		System.out.println("shuffle mode");
 
-        Dome dome = new Dome(6);
-        OPC opc = new OPC();
-
-        if (args.length > 0) {
-            for (int i = 0; i < 5; i++)
-                RunAnimation(dome, opc, args[0], 0);
-        }
-        else{
-            Random random = new Random(0);
-            String[] animations = new String[] {
-                    "rings",
-                    "cloud",
-                    "kaleidoscope",
-                    "twinkle",
-                    "pixeltest",
-                    "noire",
-                    "snowflake",
-                    "dontknow"};
-            while (true)
-            {
-                int dice = random.nextInt(animations.length);
-                System.out.println(dice);
-                RunAnimation(dome, opc, animations[dice], 60);
-            }
-        }
+		Random random = new Random();
+		Set<String> excludeFromShuffle = new HashSet<String>(Arrays.asList(new String[] {
+			    "gridtest",
+			    "screencast"
+			}));
+		Set<String> sketches = headlessSketches.keySet();
+		sketches.removeAll(excludeFromShuffle);
+		List<String> animations = new ArrayList<String>(sketches);
+		while (true) {
+		    RunAnimation(dome, opc, animations.get(random.nextInt(animations.size())), 60);
+		}
+	    }
+	}
     }
 
     private static void RunAnimation(Dome dome, OPC opc, String name, int duration)
     {
-        DomeAnimation animation;
-        if (name.equals("rings")) {
-            System.out.println("Starting rings");
-            animation = new Rings(dome, opc);
-        } else if (name.equals("cloud")) {
-            System.out.println("Starting cloud");
-            animation = new Cloud(dome, opc);
-        } else if (name.equals("kaleidoscope")) {
-            System.out.println("Starting kaleidoscope");
-            animation = new Kaleidoscope(dome, opc);
-        } else if (name.equals("twinkle")) {
-            System.out.println("Starting twinkle");
-            animation = new Twinkle(dome, opc);
-        } else if (name.equals("pixeltest")) {
-            System.out.println("Starting pixeltest");
-            animation = new PixelTest(dome, opc);
-        } else if (name.equals("gridtest")) {
-            System.out.println("Starting gridtest");
-            animation = new GridTest(dome, opc);
-        } else if (name.equals("noire")) {
-            System.out.println("Starting noire");
-            animation = new Noire(dome, opc);
-        } else if (name.equals("snowflake")) {
-            System.out.println("Starting snowflake");
-            animation = new Snowflake(dome, opc);
-        } else if (name.equals("dontknow")) {
-            System.out.println("Starting dontknow");
-            animation = new DontKnow(dome, opc);
-        } else
-            animation = new Rings(dome, opc);
+	if (!headlessSketches.containsKey(name)) {
+	    throw new RuntimeException("animation [" + name + "] not recognized");
+	}
 
+	Class<DomeAnimation> sketch = headlessSketches.get(name);
+        DomeAnimation animation;	
+	try {
+	    animation = sketch.getConstructor(Dome.class, OPC.class).newInstance(new Object[] {dome, opc});
+	} catch (Exception e) {
+	    throw new RuntimeException(e);
+	}	
+
+	System.out.println("Starting " + name);
         RunAnimation(animation, duration);
     }
 

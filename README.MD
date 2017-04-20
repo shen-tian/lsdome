@@ -27,7 +27,9 @@ Work in progress: the project is split between two parts right now:
 #### Headless java app
 
 The headless code is organised as a Java app. It's built by `gradle`.
-`gradle installDist` places it in the `\build\install\lsdome` folder.
+Before running `gradle`, set `local_processing_install` in `build.gradle`
+to the path of your processing installation.
+`gradle installDist` builds and places it in the `\build\install\lsdome` folder.
 Running the `./bin/lsdome` script launches it. It accepts these parameters:
 
     lsdome [cloud|rings|kaleidoscope|twinkle|pixeltest]
@@ -39,35 +41,14 @@ file to configure where the OPC serer is. Sample file:
     opchostname=192.168.1.123
     opcport=7890
 
-#### Sketches
+### Dependencies
 
-The sketches are a bit different. The source sits in the `src/sketches` folder.
-To run them: 
+You must install Processing 2.2.1
 
-1. Install [lsdome-processing](https://github.com/shen-tian/lsdome-processing)
-into your processing libraries folder.
-2. Open the relevant sketch in Processing 2.
-3. Build, run. Blah. 
+On ubuntu:
 
-The legacy instructions below probably also works.
-
-### Install (Legacy)
-
-1. Download Processing 2 (As of time of writing, this should be 2.2.1). Unpack
-this into a folder (`~\processing-2.2.1`) for rest of the document.
-2. Open Processing IDE. Do Tools -> Install processing-java. Do it for individual
-or something ensure that it's in the processing folder.
-3. Ensure java JDK is installed. (i.e. javac is there)
-4. `git clone` blah blah.
-
-Add the `lsdome-processing` lib to your Processing. Follow the instruction on
-the project page.
-
-To build, goto root folder, then
-
-    ./src/scripts/launchsketch.sh ~/processing-2.2.1 pixel_test
-    
-This should yield magic.
+    add-apt-repository ppa:mc3man/gstffmpeg-keep && apt-get update
+    apt-get install gstreamer0.10-plugins-base gstreamer0.10-plugins-good gstreamer0.10-ffmpeg gstreamer0.10-pulseaudio gstreamer0.10-alsa
 
 ### Simulator
 
@@ -82,10 +63,9 @@ And maybe some dependcies. on ubuntu:
 Build the thing:
    
     make
-    
-Then, grab `13panel-gl_server.json` from our lsdome `src/config/` and  put it in `openpixelcontrol/layouts`.
-    
-    bin/gl_server -l /13panel-gl_server.json -p 7890
-    
-to start the simulator.
 
+Then run:
+
+    bin/gl_server -l $LSDOME_REPO_PATH/src/config/simulator_layouts/opcsimulator_layout_24.json -p 7890
+    
+Use the layout file for the corresponding number of panels.

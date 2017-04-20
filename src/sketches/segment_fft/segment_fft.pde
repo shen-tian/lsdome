@@ -28,7 +28,7 @@ void setup()
 {
     size(300, 300, P3D);
 
-    Dome dome = new Dome(6);
+    Dome dome = new Dome();
     OPC opc = new OPC();
     simple = new CanvasSketch(this, dome, opc);
 
